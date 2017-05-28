@@ -1,0 +1,371 @@
+---
+title: "Pendulum"
+author: "Alfonso R. Reyes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Pendulum with Euler-Richardson ODE solver
+
+```{r}
+# This code can also be found in the `examples` folder under this name:
+#
+# Pendulum.R
+#
+# Original Pendulum class uses Euler-Richardson solver
+#
+
+setClass("Pendulum", slots = c(
+    omega0Squared = "numeric",
+    state = "numeric",
+    odeSolver = "EulerRichardson"
+    ),
+    prototype = prototype(
+        omega0Squared = 3,
+        state = c(0, 0, 0)
+    ),
+    contains = c("ODE")
+    )
+
+setMethod("initialize", "Pendulum", function(.Object) {
+    .Object@odeSolver <- EulerRichardson(.Object)
+    return(.Object)
+})
+
+setMethod("setStepSize", signature("Pendulum"), function(object, dt, ...) {
+    # use explicit parameter declaration
+    # setStepSize generic may use two different step parameters: stepSize and dt
+    object@odeSolver <- setStepSize(object@odeSolver, dt)
+    object
+})
+
+
+setMethod("step", "Pendulum", function(object) {
+    object@odeSolver <- step(object@odeSolver)
+    object@rate  <- object@odeSolver@ode@rate
+    object@state <- object@odeSolver@ode@state
+    object
+})
+
+setMethod("setState", signature("Pendulum"), function(object, theta, thetaDot, ...) {
+    object@state[1] <- theta     # angle
+    object@state[2] <- thetaDot  # derivative of angle
+    #                              state[3] is time
+    object@odeSolver@ode@state <- object@state
+    object
+})
+
+setMethod("getState", "Pendulum", function(object) {
+    object@state
+})
+
+
+setMethod("getRate", "Pendulum", function(object, state, ...) {
+    object@rate[1] <- state[2]     # rate of change of angle
+    object@rate[2] <- -object@omega0Squared * sin(state[1]) # rate of change dtheta
+    object@rate[3] <- 1            # rate of change of time, dt/dt
+
+    object@state <- object@odeSolver@ode@state <- state
+    # object@rate  <- object@odeSolver@ode@rate  <- rate
+    # object@rate
+    invisible(object@rate)
+})
+
+
+# constructor
+Pendulum <- function()  new("Pendulum")
+
+
+
+# #############
+# This code can also be found in the `examples` folder under this name:
+#
+# PendulumApp.R
+#
+PendulumApp <- function(verbose = FALSE) {
+    
+    library(ggplot2)
+    
+    ode <- new("ODE")
+    pendulum <- Pendulum()
+    
+    dt <- 0.1
+    theta <- 0.2
+    thetaDot <- 0
+    
+    pendulum@state[3] <- 0      # set time to zero, t = 0
+    
+    pendulum <- setState(pendulum, theta, thetaDot)
+    pendulum <- setStepSize(pendulum, dt = dt) # using stepSize in RK4
+    
+    pendulum@odeSolver <- setStepSize(pendulum@odeSolver, dt) # set new step size
+    
+    rowvec <- vector("list")
+    i <- 1
+    while (pendulum@state[3] <= 1000)    {
+        rowvec[[i]] <- list(state1 = pendulum@state[1], # angle
+                            state2 = pendulum@state[2],  # derivative of the angle
+                            state3 = pendulum@state[3])       # time
+        if (verbose)
+            cat(sprintf("state1=%12f state2=%12f state3=%12f \n", 
+                        pendulum@state[1], pendulum@state[2], pendulum@state[3]))
+        i <- i + 1
+        pendulum <- step(pendulum)
+    }
+    DT.ER<- data.table::rbindlist(rowvec)
+    
+    print(ggplot(DT.ER, aes(x = state3, y = state1)) + geom_line(col = "blue"))
+    print(ggplot(DT.ER, aes(x = state3, y = state2)) + geom_line(col = "red"))
+    # save(DTRK4, file = "./data/pendulumRK4_1e-3.rda")
+}
+
+
+PendulumApp()
+
+```
+
+
+
+
+## Pendulum with Euler
+
+```{r}
+# ###################
+# This code can also be found in the `examples` folder under this name:
+#
+# PendulumEuler.R
+#
+# The original Pendulum uses Euler-Richardson solver
+#
+#
+setClass("PendulumEuler", slots = c(
+    omega0Squared = "numeric",
+    state = "numeric",
+    odeSolver = "Euler"
+    ),
+    prototype = prototype(
+        omega0Squared = 3,
+        state = c(0, 0, 0)
+    ),
+    contains = c("ODE")
+    )
+
+setMethod("initialize", "PendulumEuler", function(.Object) {
+    .Object@odeSolver <- Euler(.Object)
+    return(.Object)
+})
+
+
+setMethod("setStepSize", signature("PendulumEuler"), function(object, dt, ...) {
+    # use explicit parameter declaration
+    # setStepSize generic may use two different step parameters: stepSize and dt
+    object@odeSolver <- setStepSize(object@odeSolver, dt)
+    object
+})
+
+
+setMethod("step", "PendulumEuler", function(object) {
+    object@odeSolver <- step(object@odeSolver)
+    object@rate  <- object@odeSolver@ode@rate
+    object@state <- object@odeSolver@ode@state
+    object
+})
+
+setMethod("setState", "PendulumEuler", function(object, theta, thetaDot) {
+    object@state[1] <- theta     # angle
+    object@state[2] <- thetaDot  # derivative of angle
+    #                              state[3] is time
+    object@odeSolver@ode@state <- object@state
+    object
+})
+
+setMethod("getState", "PendulumEuler", function(object) {
+    object@state
+})
+
+
+setMethod("getRate", "PendulumEuler", function(object, state, ...) {
+    object@rate[1] <- state[2]     # rate of change of angle                                      # diff 11
+    object@rate[2] <- -object@omega0Squared * sin(state[1])  # rate of change of dtheta
+    object@rate[3] <- 1            # rate of change of time, dt/dt
+
+    object@state <- object@odeSolver@ode@state <- state
+    # object@rate  <- object@odeSolver@ode@rate  <- rate
+    object@rate                                                   #
+})
+
+
+# constructor
+PendulumEuler <- function()  new("PendulumEuler")
+
+
+# This code can also be found in the `examples` folder under this name:
+#
+# PendulumEulerApp.R
+#
+PendulumEulerApp <- function(verbose = FALSE) {
+    library(ggplot2)
+    
+    ode <- new("ODE")
+    pendulum <- PendulumEuler()
+    
+    dt <- 0.01
+    theta <- 0.2
+    thetaDot <- 0
+    
+    pendulum@state[3] <- 0      # set time to zero, t = 0
+    
+    pendulum <- setState(pendulum, theta, thetaDot)
+    stepSize <- dt
+    pendulum <- setStepSize(pendulum, stepSize)
+    
+    pendulum@odeSolver <- setStepSize(pendulum@odeSolver, dt) # set new step size
+    
+    rowvec <- vector("list")
+    i <- 1
+    while (pendulum@state[3] <= 1000)    {
+        rowvec[[i]] <- list(state1 = pendulum@state[1],
+                            state2 = pendulum@state[2],
+                            state3 = pendulum@state[3])
+        if (verbose)
+            cat(sprintf("state1=%12f state2=%12f state3=%12f \n", 
+                        pendulum@state[1], pendulum@state[2], pendulum@state[3]))
+        i <- i + 1
+        pendulum <- step(pendulum)
+    }
+    DT.E <- data.table::rbindlist(rowvec)
+    
+    print(ggplot(DT.E, aes(x = state3, y = state1)) + geom_line(col = "blue"))
+    print(ggplot(DT.E, aes(x = state3, y = state2)) + geom_line(col = "red"))
+    
+    # save(DTE, file = "./data/pendulumDTE_1e-2.rda")
+}
+
+
+PendulumEulerApp()
+
+```
+
+
+## Pendulum with RK4
+```{r}
+# ###################
+# This code can also be found in the `examples` folder under this name:
+#
+# PendulumRK4.R
+#
+# The original Pendulum uses Euler-Richardson solver
+#
+
+
+setClass("PendulumRK4", slots = c(
+    omega0Squared = "numeric",
+    state = "numeric",
+    odeSolver = "RK4"
+    ),
+    prototype = prototype(
+        omega0Squared = 3,
+        state = c(0, 0, 0)
+    ),
+    contains = c("ODE")
+    )
+
+setMethod("initialize", "PendulumRK4", function(.Object) {
+    .Object@odeSolver <- RK4(.Object)
+    return(.Object)
+})
+
+setMethod("setStepSize", signature("PendulumRK4"), function(object, dt, ...) {
+    # use explicit parameter declaration
+    # setStepSize generic may use two different step parameters: stepSize and dt
+    object@odeSolver <- setStepSize(object@odeSolver, dt)
+    object
+})
+
+
+
+setMethod("step", "PendulumRK4", function(object) {
+    object@odeSolver <- step(object@odeSolver)
+    object@rate  <- object@odeSolver@ode@rate
+    object@state <- object@odeSolver@ode@state
+    object
+})
+
+setMethod("setState", "PendulumRK4", function(object, theta, thetaDot) {
+    object@state[1] <- theta     # angle
+    object@state[2] <- thetaDot  # derivative of angle
+    #                              state[3] is time
+    object@odeSolver@ode@state <- object@state
+    object
+})
+
+setMethod("getState", "PendulumRK4", function(object) {
+    object@state
+})
+
+
+setMethod("getRate", "PendulumRK4", function(object, state, ...) {
+    object@rate[1] <- state[2]     # rate of change of angle                                      # diff 11
+    object@rate[2] <- -object@omega0Squared * sin(state[1])  # rate of change of dtheta
+    object@rate[3] <- 1            # rate of change of time, dt/dt
+
+    object@state <- object@odeSolver@ode@state <- state
+    # object@rate  <- object@odeSolver@ode@rate  <- rate
+    object@rate                                                 #
+})
+
+
+# constructor
+PendulumRK4 <- function()  new("PendulumRK4")
+
+
+
+# This code can also be found in the `examples` folder under this name:
+#
+# PendulumRK4App.R
+#
+PendulumRK4App <- function(verbose = FALSE) {
+    library(ggplot2)
+    
+    ode <- new("ODE")
+    pendulum <- PendulumRK4()
+    
+    dt <- 0.1
+    theta <- 0.2
+    thetaDot <- 0
+    
+    pendulum@state[3] <- 0      # set time to zero, t = 0
+    
+    pendulum <- setState(pendulum, theta, thetaDot)
+    pendulum <- setStepSize(pendulum, dt = dt) # using stepSize in RK4
+    
+    pendulum@odeSolver <- setStepSize(pendulum@odeSolver, dt) # set new step size
+    
+    rowvec <- vector("list")
+    i <- 1
+    while (pendulum@state[3] <= 1000)    {
+        rowvec[[i]] <- list(state1 = pendulum@state[1], # angle
+                            state2 = pendulum@state[2],  # derivative of the angle
+                            state3 = pendulum@state[3])  # time
+        if (verbose)
+        cat(sprintf("state1=%12f state2=%12f state3=%12f \n",
+                    pendulum@state[1], pendulum@state[2], pendulum@state[3]))
+        i <- i + 1
+        pendulum <- step(pendulum)
+    }
+    DT.RK4 <- data.table::rbindlist(rowvec)
+    
+    print(ggplot(DT.RK4, aes(x = state3, y = state1)) + geom_line(col = "blue"))
+    print(ggplot(DT.RK4, aes(x = state3, y = state2)) + geom_line(col = "red"))
+    
+    # save(DTRK4, file = "./data/pendulumRK4_1e-1.rda")
+}
+
+PendulumRK4App()
+
+```
+

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Vignette Author" />
+
+<meta name="date" content="2017-05-27" />
+
+<title>Projectile</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Projectile</h1>
+<h4 class="author"><em>Vignette Author</em></h4>
+<h4 class="date"><em>2017-05-27</em></h4>
+
+
+
+<div id="projectile-with-rk4-solver" class="section level2">
+<h2>Projectile with RK4 solver</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">####################
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<span class="co"># </span>
+<span class="co"># Projectile.R</span>
+<span class="co">#</span>
+<span class="co"># Projectile class to be solved with Euler method</span>
+<span class="co">#</span>
+
+<span class="kw">setClass</span>(<span class="st">&quot;Projectile&quot;</span>, <span class="dt">slots =</span> <span class="kw">c</span>(
+    <span class="dt">g =</span> <span class="st">&quot;numeric&quot;</span>,
+    <span class="dt">odeSolver =</span> <span class="st">&quot;RK4&quot;</span>
+    ),
+    <span class="dt">prototype =</span> <span class="kw">prototype</span>(
+        <span class="dt">g =</span> <span class="fl">9.8</span>
+    ),
+    <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
+    )
+
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Projectile&quot;</span>, function(.Object) {
+    .Object@odeSolver &lt;-<span class="st"> </span><span class="kw">RK4</span>(.Object)
+    <span class="kw">return</span>(.Object)
+})</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;setStepSize&quot;</span>, <span class="st">&quot;Projectile&quot;</span>, function(object, stepSize, ...) {
+    <span class="co"># use explicit parameter declaration</span>
+    <span class="co"># setStepSize generic has two step parameters: stepSize and dt</span>
+    object@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(object@odeSolver, stepSize)
+    object
+})</code></pre></div>
+<pre><code>## [1] &quot;setStepSize&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;step&quot;</span>, <span class="st">&quot;Projectile&quot;</span>, function(object) {
+    object@odeSolver &lt;-<span class="st"> </span><span class="kw">step</span>(object@odeSolver)
+
+    object@rate  &lt;-<span class="st"> </span>object@odeSolver@ode@rate
+    object@state &lt;-<span class="st"> </span>object@odeSolver@ode@state
+
+    object
+})</code></pre></div>
+<pre><code>## [1] &quot;step&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;setState&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Projectile&quot;</span>), function(object, x, vx, y, vy, ...) {
+    object@state[<span class="dv">1</span>] &lt;-<span class="st"> </span>x
+    object@state[<span class="dv">2</span>] &lt;-<span class="st"> </span>vx
+    object@state[<span class="dv">3</span>] &lt;-<span class="st"> </span>y
+    object@state[<span class="dv">4</span>] &lt;-<span class="st"> </span>vy
+    object@state[<span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">0</span>     <span class="co"># t + dt</span>
+
+    object@odeSolver@ode@state &lt;-<span class="st"> </span>object@state
+    object
+})</code></pre></div>
+<pre><code>## [1] &quot;setState&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Projectile&quot;</span>, function(object) {
+    object@state
+})</code></pre></div>
+<pre><code>## [1] &quot;getState&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Projectile&quot;</span>, function(object, state, ...) {
+    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]     <span class="co"># rate of change of x</span>
+    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="dv">0</span>            <span class="co"># rate of change of vx</span>
+    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span>state[<span class="dv">4</span>]     <span class="co"># rate of change of y</span>
+    object@rate[<span class="dv">4</span>] &lt;-<span class="st"> </span>-<span class="st"> </span>object@g   <span class="co"># rate of change of vy</span>
+    object@rate[<span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">1</span>            <span class="co"># dt/dt = 1</span>
+
+    object@rate
+})</code></pre></div>
+<pre><code>## [1] &quot;getRate&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># constructor</span>
+Projectile &lt;-<span class="st"> </span>function()  <span class="kw">new</span>(<span class="st">&quot;Projectile&quot;</span>)
+
+
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<span class="co">#</span>
+<span class="co"># ProjectileApp.R</span>
+<span class="co">#                                                      test Projectile with RK4</span>
+<span class="co">#                                                      originally uses Euler</span>
+ProjectileApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
+    <span class="kw">library</span>(data.table)
+    
+    x &lt;-<span class="st"> </span><span class="dv">0</span>; vx &lt;-<span class="st"> </span><span class="dv">10</span>; y &lt;-<span class="st"> </span><span class="dv">0</span>; vy &lt;-<span class="st"> </span><span class="dv">10</span>
+    state &lt;-<span class="st"> </span><span class="kw">c</span>(x, vx, y, vy, <span class="dv">0</span>)
+    dt &lt;-<span class="st"> </span><span class="fl">0.01</span>
+    
+    projectile &lt;-<span class="st"> </span><span class="kw">Projectile</span>()
+    
+    projectile &lt;-<span class="st"> </span><span class="kw">setState</span>(projectile, x, vx, y, vy)
+    projectile@odeSolver &lt;-<span class="st"> </span><span class="kw">init</span>(projectile@odeSolver, <span class="fl">0.123</span>)
+    projectile@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(projectile@odeSolver, dt)
+    
+    rowV &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>)
+    i &lt;-<span class="st"> </span><span class="dv">1</span>
+    while (projectile@state[<span class="dv">3</span>] &gt;=<span class="st"> </span><span class="dv">0</span>)    {
+        <span class="co"># state[5]:           state[1]: x;  # state[3]: y</span>
+        if (verbose)
+            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f %12f </span><span class="ch">\n</span><span class="st">&quot;</span>, projectile@state[<span class="dv">5</span>],
+                    projectile@state[<span class="dv">1</span>], projectile@state[<span class="dv">3</span>]))
+        rowV[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">state1 =</span> projectile@state[<span class="dv">1</span>],
+                          <span class="dt">state3 =</span> projectile@state[<span class="dv">3</span>],
+                          <span class="dt">state5 =</span> projectile@state[<span class="dv">5</span>])
+        projectile &lt;-<span class="st"> </span><span class="kw">step</span>(projectile)
+        i &lt;-<span class="st"> </span>i +<span class="st"> </span><span class="dv">1</span>
+    }
+    
+    datatable &lt;-<span class="st"> </span>data.table::<span class="kw">rbindlist</span>(rowV)
+    datatable
+    
+    <span class="kw">print</span>(<span class="kw">qplot</span>(state1, state3, <span class="dt">data =</span> datatable))
+    <span class="kw">print</span>(<span class="kw">qplot</span>(state1, state5, <span class="dt">data =</span> datatable))
+}
+
+
+<span class="kw">ProjectileApp</span>()</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

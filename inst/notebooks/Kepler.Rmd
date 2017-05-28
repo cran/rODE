@@ -1,0 +1,542 @@
+---
+title: "Kepler"
+author: "Alfonso R. Reyes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## The Kepler class
+
+```{r}
+# This code can also be found in the `examples` folder under this name:
+#
+# Kepler.R
+#
+
+
+setClass("Kepler", slots = c(
+    GM = "numeric"
+    ),
+    contains = c("ODE")
+)
+
+setMethod("initialize", "Kepler", function(.Object, ...) {
+    .Object@GM <- 1.0                 # gravitation constant times combined mass
+    .Object@state <- vector("numeric", 5)  # x, vx, y, vy, t
+    return(.Object)
+})
+
+
+setMethod("getState", "Kepler", function(object, ...) {
+    # Gets the state variables.
+    return(object@state)
+})
+
+
+setMethod("getRate", "Kepler", function(object, state, ...) {
+    # Computes the rate using the given state.
+    r2 <- state[1] * state[1] + state[3] * state[3]  # distance squared
+    r3 <- r2 * sqrt(r2)   # distance cubed
+    object@rate[1] <- state[2]
+    object@rate[2] <- (- object@GM * state[1]) / r3
+    object@rate[3] <- state[4]
+    object@rate[4] <- (- object@GM * state[3]) / r3
+    object@rate[5] <- 1   # time derivative
+
+    object@state <- state
+    object@rate
+
+})
+
+# constructor
+Kepler <- function(r, v) {
+    kepler <- new("Kepler")
+    kepler@state[1] = r[1]
+    kepler@state[2] = v[1]
+    kepler@state[3] = r[2]
+    kepler@state[4] = v[2]
+    kepler@state[5] = 0
+    return(kepler)
+}
+
+# This code can also be found in the `examples` folder under this name:
+#
+# KeplerApp.R
+#
+KeplerApp <- function(verbose = FALSE) {
+    
+    # set the orbit into a predefined state.
+    r <- c(2, 0)
+    v <- c(0, 0.25)
+    dt <- 0.1
+    
+    planet <- Kepler(r, v)
+    solver <- RK45(planet)
+    
+    # solver <- step(solver)
+    
+    while (planet@state[5] <= 10) {
+        solver <- step(solver)
+        planet <- solver@ode
+        if (verbose)
+            cat(sprintf("state[1]=%10f, state[2]= %10f,  
+                        state[3]=%10f, state[5]=%10f\n",
+                    planet@state[1],
+                    planet@state[2], planet@state[3], planet@state[5]))
+    }
+    
+    # at t=100, dt=0.1,  c(2.131958,     1.105316,   100.000000)
+    # Java: state[0] = 0.444912, state[1]= -1.436203, state[2]= 0.459081, state[4]= 10.033245
+    #       currentStep=    0.061646
+    # R:    state[1] = 0.444912, state[2]= -1.436203, state[3]= 0.459081, state[5]= 10.033245
+    #       currentStep= 0.06164632
+}
+
+KeplerApp()
+```
+
+
+
+## The Kepler class using the the3 DormandPrice45 ODE solver
+
+```{r}
+# This code can also be found in the `examples` folder under this name:
+# 
+# KeplerDormandPrince45.R
+#
+#
+
+setClass("Kepler", slots = c(
+    GM = "numeric",
+    odeSolver = "DormandPrince45",
+    counter = "numeric"
+    ),
+    contains = c("ODE")
+)
+
+setMethod("initialize", "Kepler", function(.Object, ...) {
+    .Object@GM <- 4 * pi * pi                # gravitation constant times combined mass
+    .Object@state <- vector("numeric", 5)  # x, vx, y, vy, t
+    .Object@odeSolver <- DormandPrince45(.Object)
+    .Object@counter <- 0
+    return(.Object)
+})
+
+setMethod("doStep", "Kepler", function(object, ...) {
+    # cat("state@doStep=", object@state, "\n")
+    object@odeSolver <- step(object@odeSolver)
+
+    object@state <- object@odeSolver@ode@state
+
+    # object@rate <- object@odeSolver@ode@rate
+    # cat("\t", object@odeSolver@ode@state)
+    object
+})
+
+setMethod("getTime", "Kepler", function(object, ...) {
+    return(object@state[5])
+})
+
+setMethod("getEnergy", "Kepler", function(object, ...) {
+    ke <- 0.5 * (object@state[2] * object@state[2] +
+                     object@state[4] * object@state[4])
+    pe <- -object@GM / sqrt(object@state[1] * object@state[1] +
+                                object@state[3] * object@state[3])
+    return(pe+ke)
+})
+
+setMethod("init", "Kepler", function(object, initState, ...) {
+    object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+
+    # object@rate  <- object@odeSolver@ode@rate
+    # object@state <- object@odeSolver@ode@state
+
+    object@counter <- 0
+    object
+})
+
+setMethod("getRate", "Kepler", function(object, state, ...) {
+    # Computes the rate using the given state.
+    r2 <- state[1] * state[1] + state[3] * state[3]  # distance squared
+    r3 <- r2 * sqrt(r2)   # distance cubed
+    object@rate[1] <- state[2]
+    object@rate[2] <- (- object@GM * state[1]) / r3
+    object@rate[3] <- state[4]
+    object@rate[4] <- (- object@GM * state[3]) / r3
+    object@rate[5] <- 1   # time derivative
+
+    # object@state <- object@odeSolver@ode@state <- state
+    # object@state <- state
+    object@counter <- object@counter + 1
+    object@rate
+
+})
+
+setMethod("getState", "Kepler", function(object, ...) {
+    # Gets the state variables.
+    return(object@state)
+})
+
+# constructor
+Kepler <- function() {
+    kepler <- new("Kepler")
+    return(kepler)
+}
+
+# #########
+# This code can also be found in the `examples` folder under this name:
+#
+# KeplerDormandPrince45App.R
+#
+# Demostration of the use of ODE solver RK45
+# Brought from original routine for testing Verlet ODE solver
+#
+#
+KeplerDormandPrince45App <- function(verbose = FALSE) {
+    
+    particle <- Kepler()
+    
+    x  <- 1
+    vx <- 0
+    y  <- 0
+    vy <- 2 * pi
+    dt <- 0.01
+    tol <- 1e-3
+    
+    particle <- init(particle, c(x, vx, y, vy, 0))
+    
+    odeSolver <- DormandPrince45(particle)
+    odeSolver <- init(odeSolver, dt)
+    
+    odeSolver <- setTolerance(odeSolver, tol)   # this works for adaptive solvers
+    
+    particle@odeSolver <- odeSolver
+    
+    
+    initialEnergy <- getEnergy(particle)
+    i <- 0
+    while (getTime(particle) < 1.5) {
+        # odeSolver <- step(odeSolver)
+        particle <- doStep(particle)
+        # odeSolver <- particle@odeSolver
+        energy <- getEnergy(particle)
+        if (verbose) 
+            cat(sprintf("time=%12f energy=%12f state[5]=%12f x=%10f y=%10f \n", 
+                    getTime(particle),
+                    energy, 
+                    particle@state[5], 
+                    particle@state[1], 
+                    particle@state[3]))
+        i <- i + 1
+    }
+    # Values from Java at t approx = 1.5
+    # time=    1.444831 energy=  -19.737930 state[4]=    1.444831
+    # time=    1.507215 energy=  -19.737875 state[4]=    1.507215
+    # time=    1.569599 energy=  -19.737819 state[4]=    1.569599
+}
+
+
+KeplerDormandPrince45App()
+
+```
+
+
+## Kepler using the Euler ODE solver
+```{r}
+# This code can also be found in the `examples` folder under this name:
+#
+# KeplerEuler.R
+#
+
+
+setClass("Kepler", slots = c(
+    GM = "numeric",
+    odeSolver = "Euler",
+    counter = "numeric"
+    ),
+    contains = c("ODE")
+)
+
+setMethod("initialize", "Kepler", function(.Object, ...) {
+    .Object@GM <- 4 * pi * pi                # gravitation constant times combined mass
+    .Object@state <- vector("numeric", 5)  # x, vx, y, vy, t
+    .Object@odeSolver <- Euler(.Object)
+    .Object@counter <- 0
+    return(.Object)
+})
+
+setMethod("doStep", "Kepler", function(object, ...) {
+    # cat("state@doStep=", object@state, "\n")
+    object@odeSolver <- step(object@odeSolver)
+
+    object@state <- object@odeSolver@ode@state
+
+    # object@rate <- object@odeSolver@ode@rate
+    # cat("\t", object@odeSolver@ode@state)
+    object
+})
+
+setMethod("getTime", "Kepler", function(object, ...) {
+    return(object@state[5])
+})
+
+setMethod("getEnergy", "Kepler", function(object, ...) {
+    ke <- 0.5 * (object@state[2] * object@state[2] +
+                     object@state[4] * object@state[4])
+    pe <- -object@GM / sqrt(object@state[1] * object@state[1] +
+                                object@state[3] * object@state[3])
+    return(pe+ke)
+})
+
+setMethod("init", "Kepler", function(object, initState, ...) {
+    object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+
+    # object@rate  <- object@odeSolver@ode@rate
+    # object@state <- object@odeSolver@ode@state
+
+    object@counter <- 0
+    object
+})
+
+setMethod("getRate", "Kepler", function(object, state, ...) {
+    # Computes the rate using the given state.
+    r2 <- state[1] * state[1] + state[3] * state[3]  # distance squared
+    r3 <- r2 * sqrt(r2)   # distance cubed
+    object@rate[1] <- state[2]
+    object@rate[2] <- (- object@GM * state[1]) / r3
+    object@rate[3] <- state[4]
+    object@rate[4] <- (- object@GM * state[3]) / r3
+    object@rate[5] <- 1   # time derivative
+
+    # object@state <- object@odeSolver@ode@state <- state
+    # object@state <- state
+    object@counter <- object@counter + 1
+    object@rate
+
+})
+
+setMethod("getState", "Kepler", function(object, ...) {
+    # Gets the state variables.
+    return(object@state)
+})
+
+# constructor
+Kepler <- function() {
+    kepler <- new("Kepler")
+    return(kepler)
+}
+
+
+# This code can also be found in the `examples` folder under this name:
+#
+# KeplerApp.R
+#
+# Demostration of the use of ODE solver RK45
+#
+
+KeplerApp <- function(verbose = FALSE) {
+    
+    particle <- Kepler()
+    
+    x  <- 1
+    vx <- 0
+    y  <- 0
+    vy <- 2 * pi
+    dt <- 0.01
+    tol <- 1e-3
+    
+    particle <- init(particle, c(x, vx, y, vy, 0))
+    
+    odeSolver <- Euler(particle)
+    odeSolver <- init(odeSolver, dt)
+    
+    particle@odeSolver <- odeSolver
+    
+    # odeSolver <- setTolerance(odeSolver, tol)
+    # particle@odeSolver <- init(particle@odeSolver, dt)
+    
+    
+    initialEnergy <- getEnergy(particle)
+    i <- 0
+    while (i < 100) {
+        # odeSolver <- step(odeSolver)
+        particle <- doStep(particle)
+        # odeSolver <- particle@odeSolver
+        energy <- getEnergy(particle)
+        if (verbose)
+            cat(sprintf("time=%12f energy=%12f state[5]=%12f \n", 
+                    getTime(particle), energy, particle@state[5]))
+        i <- i + 1
+    }
+
+}
+
+KeplerApp()
+
+```
+
+
+
+
+
+## Kepler using the Verlet ODE solver
+```{r}
+# This code can also be found in the `examples` folder under this name:
+#
+# KeplerVerlet.R
+#
+
+setClass("KeplerVerlet", slots = c(
+    GM = "numeric",
+    odeSolver = "Verlet",
+    counter = "numeric"
+    ),
+    contains = c("ODE")
+)
+
+setMethod("initialize", "KeplerVerlet", function(.Object, ...) {
+    .Object@GM <- 4 * pi * pi                # gravitation constant times combined mass
+    .Object@state <- vector("numeric", 5)  # x, vx, y, vy, t
+    # .Object@odeSolver <- Verlet(ode = .Object)
+    .Object@odeSolver <- Verlet(.Object)
+    .Object@counter <- 0
+    return(.Object)
+})
+
+setMethod("doStep", "KeplerVerlet", function(object, ...) {
+    # cat("state@doStep=", object@state, "\n")
+    object@odeSolver <- step(object@odeSolver)
+
+    object@state <- object@odeSolver@ode@state
+
+    # object@rate <- object@odeSolver@ode@rate
+    # cat("\t", object@odeSolver@ode@state)
+    object
+})
+
+setMethod("getTime", "KeplerVerlet", function(object, ...) {
+    return(object@state[5])
+})
+
+setMethod("getEnergy", "KeplerVerlet", function(object, ...) {
+    ke <- 0.5 * (object@state[2] * object@state[2] +
+                     object@state[4] * object@state[4])
+    pe <- -object@GM / sqrt(object@state[1] * object@state[1] +
+                                object@state[3] * object@state[3])
+    return(pe+ke)
+})
+
+setMethod("init", "KeplerVerlet", function(object, initState, ...) {
+    object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+
+    # object@rate  <- object@odeSolver@ode@rate
+    # object@state <- object@odeSolver@ode@state
+
+    object@counter <- 0
+    object
+})
+
+setMethod("getRate", "KeplerVerlet", function(object, state, ...) {
+    # Computes the rate using the given state.
+    r2 <- state[1] * state[1] + state[3] * state[3]  # distance squared
+    r3 <- r2 * sqrt(r2)   # distance cubed
+    object@rate[1] <- state[2]
+    object@rate[2] <- (- object@GM * state[1]) / r3
+    object@rate[3] <- state[4]
+    object@rate[4] <- (- object@GM * state[3]) / r3
+    object@rate[5] <- 1   # time derivative
+
+    # object@state <- object@odeSolver@ode@state <- state
+    # object@state <- state
+    object@counter <- object@counter + 1
+    object@rate
+
+})
+
+setMethod("getState", "KeplerVerlet", function(object, ...) {
+    # Gets the state variables.
+    return(object@state)
+})
+
+# constructor
+KeplerVerlet <- function() {
+    kepler <- new("KeplerVerlet")
+    return(kepler)
+}
+
+
+# This code can also be found in the `examples` folder under this name:
+#
+# KeplerVerletApp.R
+#
+# Demostration of the use of ODE solver RK45
+#
+#
+KeplerVerletApp <- function(verbose = FALSE) {
+    
+    x  <- 1
+    vx <- 0
+    y  <- 0
+    vy <- 2 * pi
+    dt <- 0.01
+    tol <- 1e-3
+    
+    particle <- KeplerVerlet()
+    
+    particle <- init(particle, c(x, vx, y, vy, 0))
+    
+    odeSolver <- Verlet(particle)
+    odeSolver <- init(odeSolver, dt)
+    
+    particle@odeSolver <- odeSolver
+    
+    # odeSolver <- setTolerance(odeSolver, tol)
+    # particle@odeSolver <- init(particle@odeSolver, dt)
+    
+    initialEnergy <- getEnergy(particle)
+    i <- 0
+    while (getTime(particle) <= 1.20) {
+        # odeSolver <- step(odeSolver)
+        particle <- doStep(particle)
+        # odeSolver <- particle@odeSolver
+        energy <- getEnergy(particle)
+        if (verbose)
+            cat(sprintf("time=%12f energy=%12f state[5]=%12f \n", 
+                        getTime(particle), energy, particle@state[5]))
+        i <- i + 1
+    }
+    
+    #' output from Java run
+    #'
+    # time=    0.970000 energy=  -19.739208 state[4]=    0.970000
+    # time=    0.980000 energy=  -19.739208 state[4]=    0.980000
+    # time=    0.990000 energy=  -19.739209 state[4]=    0.990000
+    # time=    1.000000 energy=  -19.739209 state[4]=    1.000000
+    # time=    1.010000 energy=  -19.739209 state[4]=    1.010000
+    # time=    1.020000 energy=  -19.739209 state[4]=    1.020000
+    # time=    1.030000 energy=  -19.739208 state[4]=    1.030000
+    # time=    1.040000 energy=  -19.739208 state[4]=    1.040000
+    
+    #' output from R run
+    #'
+    # time=    0.970000 energy=  -19.739208 state[5]=    0.970000
+    # time=    0.980000 energy=  -19.739208 state[5]=    0.980000
+    # time=    0.990000 energy=  -19.739209 state[5]=    0.990000
+    # time=    1.000000 energy=  -19.739209 state[5]=    1.000000
+    # time=    1.010000 energy=  -19.739209 state[5]=    1.010000
+    # time=    1.020000 energy=  -19.739209 state[5]=    1.020000
+    # time=    1.030000 energy=  -19.739208 state[5]=    1.030000
+    # time=    1.040000 energy=  -19.739208 state[5]=    1.040000
+}
+
+
+KeplerVerletApp()
+```
+

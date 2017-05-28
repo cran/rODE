@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Alfonso R. Reyes" />
+
+<meta name="date" content="2017-05-27" />
+
+<title>Pendulum</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Pendulum</h1>
+<h4 class="author"><em>Alfonso R. Reyes</em></h4>
+<h4 class="date"><em>2017-05-27</em></h4>
+
+
+
+<div id="pendulum-with-euler-richardson-ode-solver" class="section level2">
+<h2>Pendulum with Euler-Richardson ODE solver</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<span class="co">#</span>
+<span class="co"># Pendulum.R</span>
+<span class="co">#</span>
+<span class="co"># Original Pendulum class uses Euler-Richardson solver</span>
+<span class="co">#</span>
+
+<span class="kw">setClass</span>(<span class="st">&quot;Pendulum&quot;</span>, <span class="dt">slots =</span> <span class="kw">c</span>(
+    <span class="dt">omega0Squared =</span> <span class="st">&quot;numeric&quot;</span>,
+    <span class="dt">state =</span> <span class="st">&quot;numeric&quot;</span>,
+    <span class="dt">odeSolver =</span> <span class="st">&quot;EulerRichardson&quot;</span>
+    ),
+    <span class="dt">prototype =</span> <span class="kw">prototype</span>(
+        <span class="dt">omega0Squared =</span> <span class="dv">3</span>,
+        <span class="dt">state =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)
+    ),
+    <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
+    )
+
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(.Object) {
+    .Object@odeSolver &lt;-<span class="st"> </span><span class="kw">EulerRichardson</span>(.Object)
+    <span class="kw">return</span>(.Object)
+})</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;setStepSize&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Pendulum&quot;</span>), function(object, dt, ...) {
+    <span class="co"># use explicit parameter declaration</span>
+    <span class="co"># setStepSize generic may use two different step parameters: stepSize and dt</span>
+    object@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(object@odeSolver, dt)
+    object
+})</code></pre></div>
+<pre><code>## [1] &quot;setStepSize&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;step&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(object) {
+    object@odeSolver &lt;-<span class="st"> </span><span class="kw">step</span>(object@odeSolver)
+    object@rate  &lt;-<span class="st"> </span>object@odeSolver@ode@rate
+    object@state &lt;-<span class="st"> </span>object@odeSolver@ode@state
+    object
+})</code></pre></div>
+<pre><code>## [1] &quot;step&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;setState&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Pendulum&quot;</span>), function(object, theta, thetaDot, ...) {
+    object@state[<span class="dv">1</span>] &lt;-<span class="st"> </span>theta     <span class="co"># angle</span>
+    object@state[<span class="dv">2</span>] &lt;-<span class="st"> </span>thetaDot  <span class="co"># derivative of angle</span>
+    <span class="co">#                              state[3] is time</span>
+    object@odeSolver@ode@state &lt;-<span class="st"> </span>object@state
+    object
+})</code></pre></div>
+<pre><code>## [1] &quot;setState&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(object) {
+    object@state
+})</code></pre></div>
+<pre><code>## [1] &quot;getState&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(object, state, ...) {
+    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]     <span class="co"># rate of change of angle</span>
+    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>-object@omega0Squared *<span class="st"> </span><span class="kw">sin</span>(state[<span class="dv">1</span>]) <span class="co"># rate of change dtheta</span>
+    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>            <span class="co"># rate of change of time, dt/dt</span>
+
+    object@rate
+})</code></pre></div>
+<pre><code>## [1] &quot;getRate&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># constructor</span>
+Pendulum &lt;-<span class="st"> </span>function()  <span class="kw">new</span>(<span class="st">&quot;Pendulum&quot;</span>)
+
+
+
+<span class="co"># #############</span>
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<span class="co">#</span>
+<span class="co"># PendulumApp.R</span>
+<span class="co">#</span>
+PendulumApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
+    
+    <span class="kw">library</span>(ggplot2)
+    
+    ode &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;ODE&quot;</span>)
+    pendulum &lt;-<span class="st"> </span><span class="kw">Pendulum</span>()
+    
+    dt &lt;-<span class="st"> </span><span class="fl">0.1</span>
+    theta &lt;-<span class="st"> </span><span class="fl">0.2</span>
+    thetaDot &lt;-<span class="st"> </span><span class="dv">0</span>
+    
+    pendulum@state[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>      <span class="co"># set time to zero, t = 0</span>
+    
+    pendulum &lt;-<span class="st"> </span><span class="kw">setState</span>(pendulum, theta, thetaDot)
+    pendulum &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(pendulum, <span class="dt">dt =</span> dt) <span class="co"># using stepSize in RK4</span>
+    
+    pendulum@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(pendulum@odeSolver, dt) <span class="co"># set new step size</span>
+    
+    rowvec &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>)
+    i &lt;-<span class="st"> </span><span class="dv">1</span>
+    while (pendulum@state[<span class="dv">3</span>] &lt;=<span class="st"> </span><span class="dv">1000</span>)    {
+        rowvec[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">state1 =</span> pendulum@state[<span class="dv">1</span>], <span class="co"># angle</span>
+                            <span class="dt">state2 =</span> pendulum@state[<span class="dv">2</span>],  <span class="co"># derivative of the angle</span>
+                            <span class="dt">state3 =</span> pendulum@state[<span class="dv">3</span>])       <span class="co"># time</span>
+        if (verbose)
+            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;state1=%12f state2=%12f state3=%12f </span><span class="ch">\n</span><span class="st">&quot;</span>, 
+                        pendulum@state[<span class="dv">1</span>], pendulum@state[<span class="dv">2</span>], pendulum@state[<span class="dv">3</span>]))
+        i &lt;-<span class="st"> </span>i +<span class="st"> </span><span class="dv">1</span>
+        pendulum &lt;-<span class="st"> </span><span class="kw">step</span>(pendulum)
+    }
+    DT.ER&lt;-<span class="st"> </span>data.table::<span class="kw">rbindlist</span>(rowvec)
+    
+    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT.ER, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state1)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>))
+    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT.ER, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state2)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;red&quot;</span>))
+    <span class="co"># save(DTRK4, file = &quot;./data/pendulumRK4_1e-3.rda&quot;)</span>
+}
+
+
+<span class="kw">PendulumApp</span>()</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

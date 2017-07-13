@@ -1,10 +1,10 @@
 ---
-title: "Kepler"
+title: "Kepler. Interaction between two planets."
 author: "Alfonso R. Reyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Kepler. Interaction between two planets.}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

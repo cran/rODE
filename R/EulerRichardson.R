@@ -1,3 +1,5 @@
+# EulerRichardson.R
+
 
 # * An Euler-Richardson (midpoint) method ODE solver.
 # *

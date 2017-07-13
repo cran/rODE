@@ -1,5 +1,4 @@
 # AbstractODESolver.R
-#
 
 #' AbstractODESolver class
 #'

@@ -27,8 +27,7 @@ importFromExamples("ODETest.R")
          state <- getState(ode_solver@ode)    # get the `state` vector
          i <- i + 1
      }
-     DT <- data.table::rbindlist(rowVector)    # a data table with the results
-     return(DT)
+     return(data.table::rbindlist(rowVector))    # a data table with the results
  }
 # show solution
 solution <- ComparisonRK45App()                          # run the example

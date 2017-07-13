@@ -1,5 +1,7 @@
 library(testthat)
 
+context("test Euler")
+
 # source("./R/ode_generics.R")
 # source("./R/Euler.R")
 
@@ -14,7 +16,7 @@ test_that("No ODE parameter supplied", {
 
 euler <- Euler(ode)
 
-test_that("Class is correct", {
+test_that("Class is Euler", {
     expect_true(class(euler) == "Euler")
 })
 
@@ -27,24 +29,34 @@ state <- c(0, 1, 3)
 
 euler@ode@state <-  c(0, 1, 3)             # set a vector for state
 
-expect_equal(getStepSize(euler), 0.1)        # get default step size
-
+test_that("getStepSize has the expected value", {
+    expect_equal(getStepSize(euler), 0.1)        # get default step size
+})
+test_that("state and rate hold no values", {
 # ----------------------------------------- these two vars hold no values
-expect_true(length(ode@state) == 0)
-expect_true(length(ode@rate)  == 0)
+    expect_true(length(ode@state) == 0)
+    expect_true(length(ode@rate)  == 0)
+})
 
+test_that("state and rate are store in ode slot", {
 # +++++++++++++++++++++++++++++++++++++++++ values stored here
-expect_true(all(euler@ode@state == state))
-expect_true(length(euler@ode@rate) == 0)
+    expect_true(all(euler@ode@state == state))
+    expect_true(length(euler@ode@rate) == 0)
+})
+
 
 euler <- init(euler, 0.123)
 
-expect_equal(euler@ode@state, state)
-expect_equal(euler@numEqn, 3)
+test_that("EUler initializes OK", {
+    expect_equal(euler@ode@state, state)
+    expect_equal(euler@numEqn, 3)
+})
 
 euler <- setStepSize(euler, 0.1010)     # set a new step size
-expect_equal(getStepSize(euler), 0.1010)
 
+test_that("step size is correct", {
+    expect_equal(getStepSize(euler), 0.1010)
+})
 # step(euler)
 
 test_that("values correct after init", {

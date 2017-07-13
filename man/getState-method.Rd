@@ -19,50 +19,13 @@ getState(object, ...)
 Get current state of the system
 }
 \examples{
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++      example: VanderPol.R
+# ++++++++++++++++++++++++++++++++++++++++++++++++   application: VanderPolApp.R
 # Solution of the Van der Pol equation
 #
-
-
-setClass("VanderPol", slots = c(
-    mu = "numeric"
-),
-contains = c("ODE")
-)
-
-setMethod("initialize", "VanderPol", function(.Object, ...) {
-    .Object@mu <- 1.0                 # gravitation constant times combined mass
-    .Object@state <- vector("numeric", 3)  # y1, y2, t
-    return(.Object)
-})
-
-
-setMethod("getState", "VanderPol", function(object, ...) {
-    # Gets the state variables.
-    return(object@state)
-})
-
-
-setMethod("getRate", "VanderPol", function(object, state, ...) {
-    # Computes the rate using the given state.
-    object@rate[1] <- state[2]
-    object@rate[2] <-  object@mu* (1 - state[1]^2) * state[2] - state[1]
-    object@rate[3] <- 1
-
-    object@rate
-})
-
-# constructor
-VanderPol <- function(y1, y2) {
-    VanderPol <- new("VanderPol")
-    VanderPol@state[1] = y1
-    VanderPol@state[2] = y2
-    VanderPol@state[3] = 0
-    return(VanderPol)
-}
+importFromExamples("VanderPol.R")
 
 # run the application
-VanderPolApp <- function(verbose = FALSE) {
+VanderpolApp <- function(verbose = FALSE) {
     # set the orbit into a predefined state.
     y1 <- 2; y2 <- 0; dt <- 0.1;
     rigid_body <- VanderPol(y1, y2)
@@ -82,76 +45,13 @@ VanderPolApp <- function(verbose = FALSE) {
 
 }
 # show solution
-solution <- VanderPolApp()
+solution <- VanderpolApp()
 plot(solution)
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++   application:  SpringRK4.R
+# ++++++++++++++++++++++++++++++++++++++++++++++++++application:  SpringRK4App.R
 # Simulation of a spring considering no friction
-library(rODE)
 
-
-setClass("SpringRK4", slots = c(
-    # we should improve this by letting the user entered these values
-    K         = "numeric",
-    mu        = "numeric",
-    mass      = "numeric",
-    state     = "numeric",
-    odeSolver = "RK4"
-    ),
-    prototype = prototype(
-        K = 1,
-        state = c(0, 0, 0)
-    ),
-    contains = c("ODE")
-    )
-
-setMethod("initialize", "SpringRK4", function(.Object) {
-    # we should improve this by letting the user entered these values
-    .Object@K    <- 1.0
-    .Object@mu   <- 1.5
-    .Object@mass <- 20
-    .Object@odeSolver <- RK4(.Object)
-    return(.Object)
-})
-
-setMethod("setStepSize", signature("SpringRK4"), function(object, dt, ...) {
-    # use explicit parameter declaration
-    # setStepSize generic may use two different step parameters: stepSize and dt
-    object@odeSolver <- setStepSize(object@odeSolver, dt)
-    object
-})
-
-
-setMethod("step", "SpringRK4", function(object) {
-    object@odeSolver <- step(object@odeSolver)
-    object@rate  <- object@odeSolver@ode@rate
-    object@state <- object@odeSolver@ode@state
-    object
-})
-
-setMethod("setState", "SpringRK4", function(object, theta, thetaDot) {
-    object@state[1] <- theta     # angle
-    object@state[2] <- thetaDot  # derivative of the angle
-    #                              state[3] is time
-    object@odeSolver@ode@state <- object@state      # set state on solver
-    object
-})
-
-setMethod("getState", "SpringRK4", function(object) {
-    object@state
-})
-
-setMethod("getRate", "SpringRK4", function(object, state, ...) {
-    # enter the derivatives here
-    object@rate[1] <- state[2]     # rate of change of angle
-    object@rate[2] <- -object@mu /  object@mass * state[2] - object@K * state[1]
-    object@rate[3] <- 1            # rate of change of time, dt/dt
-
-    object@rate
-})
-
-# constructor
-SpringRK4 <- function()  new("SpringRK4")
+importFromExamples("SpringRK4.R")
 
 
 # run application
@@ -179,6 +79,6 @@ SpringRK4App <- function(verbose = FALSE) {
 }
 
 # show solution
-solution <- SpringRK4App(TRUE)
+solution <- SpringRK4App()
 plot(solution)
 }

@@ -54,8 +54,7 @@ importFromExamples("ODETest.R")
          state <- getState(ode_solver@ode)    # get the `state` vector
          i <- i + 1
      }
-     DT <- data.table::rbindlist(rowVector)    # a data table with the results
-     return(DT)
+     return(data.table::rbindlist(rowVector))    # a data table with the results
  }
 # show solution
 solution <- ComparisonRK45App()                          # run the example
@@ -104,6 +103,30 @@ KeplerDormandPrince45App <- function(verbose = FALSE) {
 solution <- KeplerDormandPrince45App()
 plot(solution)
 
+
+importFromExamples("AdaptiveStep.R")
+
+# running function
+AdaptiveStepApp <- function(verbose = FALSE) {
+    ode        <- new("Impulse")
+    ode_solver <- RK45(ode)
+    ode_solver <- init(ode_solver, 0.1)
+    ode_solver <- setTolerance(ode_solver, 1.0e-4)
+    i <- 1; rowVector <- vector("list")
+    while (getState(ode)[1] < 12) {
+        rowVector[[i]] <- list(s1 = getState(ode)[1],
+                               s2 = getState(ode)[2],
+                               t  = getState(ode)[3])
+        ode_solver <- step(ode_solver)
+        ode <- ode_solver@ode
+        i <- i + 1
+    }
+    return(data.table::rbindlist(rowVector))
+}
+
+# run application
+solution <- AdaptiveStepApp()
+plot(solution)
 # +++++++++++++++++++++++++++++++++++++++++ Example:      ComparisonRK45ODEApp.R
 # Updates the ODE state instead of using the internal state in the ODE solver
 # Also plots the solver solution versus the analytical solution at a

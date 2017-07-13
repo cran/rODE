@@ -1,5 +1,4 @@
 # ODESolver.R
-#
 
 #' ODESolver virtual class
 #'

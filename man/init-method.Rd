@@ -51,7 +51,7 @@ setMethod("init", "Kepler", function(object, initState, ...) {
     object
 })
 
-# init method in Logistic.R
+# init method in LogisticApp.R
 setMethod("init", "Logistic", function(object, initState, r, K, ...) {
     object@r <- r
     object@K <- K

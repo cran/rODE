@@ -1,9 +1,5 @@
 library(testthat)
-
-# source("./R/ODE.R")
-# source("./R/AbstractODESolver.R")
-
-
+context("test AbstractODESolver")
 
 test_that("there are no constructor for ODE", {
     expect_error(ode <- ODE(), 'could not find function "ODE"')
@@ -14,15 +10,11 @@ test_that("Constructor needs ODE parameter", {
 })
 
 
-
-
 test_that("Class is correct", {
     ode <- new("ODE")
     odesolver <- AbstractODESolver(ode)
     expect_true(class(odesolver) == "AbstractODESolver")
 })
-
-
 
 
 test_that("Have correct slot names", {
@@ -31,8 +23,6 @@ test_that("Have correct slot names", {
     expect_equal(slotNames(odesolver), c("stepSize", "numEqn", "ode"))
     expect_equal(slotNames(odesolver@ode), c("state", "rate"))
 })
-
-
 
 
 # test_that("Get the default step size", {
@@ -50,6 +40,7 @@ test_that("ODE object are zero", {
     expect_true(length(ode@state) == 0)
     expect_true(length(ode@rate)  == 0)
 })
+
 
 test_that("slots in AbstractODESolver have these values", {
     ode <- new("ODE")

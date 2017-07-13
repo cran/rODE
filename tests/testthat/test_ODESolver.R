@@ -1,8 +1,5 @@
 library(testthat)
-
-
-# source(paste(system.file("R", package = "rODE"), "utils.R", sep = "/"))
-
+context("test ODESolver")
 
 
 test_that("ODESolver cannot be instantiated because it is virtual", {
@@ -10,7 +7,6 @@ test_that("ODESolver cannot be instantiated because it is virtual", {
     expect_true(res@virtual)
     expect_error(new("ODESolver"), "trying to generate an object from a virtual class")
 })
-
 
 
 test_that("ODESolver has methods implemented", {
@@ -27,10 +23,7 @@ test_that("ODESolver has methods implemented", {
 })
 
 
-
-test_that("a subclass of ODESolver works", {
-
-
+test_that("AbstractSolver is an instance of ODESolver", {
     # build a class out of ODESolver
     setClass("AbstractSolver", slots = c(
         stepSize = "numeric",
@@ -39,10 +32,32 @@ test_that("a subclass of ODESolver works", {
     ),
     contains = c("ODESolver")
     )
-
     AbstractSolver <- new("AbstractSolver")
     expect_true(is(AbstractSolver, "ODESolver"))
-    expect_true(class(AbstractSolver) == "AbstractSolver")
-    expect_equal(slotNames("AbstractSolver"), c("stepSize", "numEqn",   "ode" ))
 })
 
+test_that("AbstractSolver is a class", {
+    # build a class out of ODESolver
+    setClass("AbstractSolver", slots = c(
+        stepSize = "numeric",
+        numEqn   = "numeric",
+        ode = "ODE"
+    ),
+    contains = c("ODESolver")
+    )
+    AbstractSolver <- new("AbstractSolver")
+    expect_true(class(AbstractSolver) == "AbstractSolver")
+})
+
+test_that("AbstractSolver has the correct slots", {
+    # build a class out of ODESolver
+    setClass("AbstractSolver", slots = c(
+        stepSize = "numeric",
+        numEqn   = "numeric",
+        ode = "ODE"
+    ),
+    contains = c("ODESolver")
+    )
+    AbstractSolver <- new("AbstractSolver")
+    expect_equal(slotNames("AbstractSolver"), c("stepSize", "numEqn",   "ode" ))
+})

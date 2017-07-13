@@ -1,3 +1,5 @@
+# utils.R
+
 #' Get the methods in a class
 #'
 #' But only those specific to the class
@@ -20,15 +22,6 @@ showMethods2 <- function(theClass) {
     # expect_equal(fvec, c("getStepSize", "init", "setStepSize", "step"))
 }
 
-#' Run test of all the examples
-#'
-#' @export
-run_test_examples <- function() {
-    test_ex_dir  <- system.file("test_examples", package="rODE")
-    examples_dir <- system.file("examples", package = "rODE")
-    source(paste(test_ex_dir, "run_open_applications.R", sep = "/"))
-}
-
 
 #' Source the R script
 #'
@@ -39,4 +32,23 @@ importFromExamples <- function(aClassFile, aFolder = "examples") {
     source(paste(system.file(aFolder, package = "rODE"),
                  aClassFile,
                  sep ="/"), echo = FALSE)
+}
+
+
+
+#' Run test all the examples
+#'
+#' @export
+run_test_applications <- function() {
+    test_ex_dir  <- system.file("test_examples", package="rODE")
+    examples_dir <- system.file("examples", package = "rODE")
+    source(paste(test_ex_dir, "run_test_applications.R", sep = "/"))
+}
+
+
+release_questions <- function() {
+    c(
+        "Have you add the names for the vignettes?",
+        "Do the examples have App in them?"
+    )
 }

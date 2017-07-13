@@ -1,10 +1,10 @@
 ---
-title: "Pendulum"
+title: "Pendulum with Euler-Richardson ODE solver"
 author: "Alfonso R. Reyes"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Pendulum with Euler-Richardson ODE solver}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

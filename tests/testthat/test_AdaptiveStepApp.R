@@ -1,5 +1,5 @@
 library(testthat)
-
+context("test AdaptiveStepApp")
 
 
 setClass("Impulse", contains = c("ODE"),
@@ -39,5 +39,7 @@ while (getState(ode)[1] < 12) {
     # cat(sprintf("state[1] =%12f, state[3] =%12f, state[2] =%12f \n", getState(ode)[1], getState(ode)[3], getState(ode)[2]))
 }
 
-expect_equal(c(getState(ode)[1], getState(ode)[3], getState(ode)[2]),
-c(19.254268,   10.099912, 2.697305), tolerance = 1.0e-7)
+test_that("output equals to expected values", {
+    expect_equal(c(getState(ode)[1], getState(ode)[3], getState(ode)[2]),
+    c(19.254268,   10.099912, 2.697305), tolerance = 1.0e-7)
+})

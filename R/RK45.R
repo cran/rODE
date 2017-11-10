@@ -1,8 +1,4 @@
-# RK45.R
-#
-# Simpler calling pf class DormandPrince45
-#
-#' RK45 class
+#' RK45 ODE solver class
 #'
 #' @param ode and ODE object
 #'

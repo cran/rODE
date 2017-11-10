@@ -10,7 +10,6 @@ PendulumEulerApp <- function(verbose = FALSE) {
     theta <- 0.2
     thetaDot <- 0
     dt <- 0.01
-    ode <- new("ODE")
     pendulum <- PendulumEuler()
     pendulum@state[3] <- 0      # set time to zero, t = 0
     pendulum <- setState(pendulum, theta, thetaDot)
@@ -19,10 +18,10 @@ PendulumEulerApp <- function(verbose = FALSE) {
     pendulum@odeSolver <- setStepSize(pendulum@odeSolver, dt) # set new step size
     rowvec <- vector("list")
     i <- 1
-    while (pendulum@state[3] <= 50)    {
-        rowvec[[i]] <- list(t = pendulum@state[3],
-                            theta = pendulum@state[1],
-                            thetaDot = pendulum@state[2])
+    while (getState(pendulum)[3] <= 50)    {
+        rowvec[[i]] <- list(t        = getState(pendulum)[3],
+                            theta    = getState(pendulum)[1],
+                            thetaDot = getState(pendulum)[2])
         pendulum <- step(pendulum)
         i <- i + 1
     }

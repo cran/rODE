@@ -1,9 +1,10 @@
-## ------------------------------------------------------------------------
+## ----message=FALSE, results='hold'---------------------------------------
+library(rODE)
+
 # This code can also be found in the `examples` folder under this name:
 #
 # Kepler.R
 #
-
 
 setClass("Kepler", slots = c(
     GM = "numeric"
@@ -22,7 +23,6 @@ setMethod("getState", "Kepler", function(object, ...) {
     # Gets the state variables.
     return(object@state)
 })
-
 
 setMethod("getRate", "Kepler", function(object, state, ...) {
     # Computes the rate using the given state.
@@ -47,6 +47,8 @@ Kepler <- function(r, v) {
     kepler@state[5] = 0
     return(kepler)
 }
+
+## ------------------------------------------------------------------------
 
 # This code can also be found in the `examples` folder under this name:
 # KeplerApp.R

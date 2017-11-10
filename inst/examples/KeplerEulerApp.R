@@ -14,10 +14,18 @@ KeplerEulerApp <- function(verbose = FALSE) {
     dt <- 0.01
     tol <- 1e-3
 
-    particle <- Kepler()                           # create a Kepler object
-    particle <- init(particle, c(x, vx, y, vy, 0)) # set particle initial values
+    particle <- Kepler()                           # create a Kepler ODE object
+
+    # Two ways of initializing the ODE object
+      # particle <- init(particle, c(x, vx, y, vy, 0)) # set initial values
+    init(particle) <-  c(x, vx, y, vy, 0)       # set particle initial values
+
     odeSolver <- Euler(particle)                   # select the solver
-    odeSolver <- init(odeSolver, dt)               # start the solver
+
+    # Two ways of initializing the solver
+      # odeSolver <- init(odeSolver, dt)               # start the solver
+    init(odeSolver) <-  dt
+
     particle@odeSolver <- odeSolver               # copy solver to ODE object
     initialEnergy <- getEnergy(particle)         # calculate the initial energy
     rowVector <- vector("list")
@@ -30,7 +38,7 @@ KeplerEulerApp <- function(verbose = FALSE) {
                                vy = particle@state[4],
                                E  = getEnergy(particle))
         particle <- doStep(particle)
-        energy <- getEnergy(particle)
+        energy   <- getEnergy(particle)
         i <- i + 1
     }
     DT <- data.table::rbindlist(rowVector)

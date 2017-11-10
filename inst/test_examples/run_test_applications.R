@@ -8,13 +8,13 @@
 
 library(testthat)
 
-# this is where examples live
-examples_dir <- system.file("examples", package = "rODE")
-
-# get all the scripts that `App` in them
-examples <- list.files(path = examples_dir, pattern = "*App", all.files = FALSE,
-           full.names = FALSE, recursive = FALSE, ignore.case = FALSE,
-           include.dirs = FALSE, no.. = FALSE)
+# # this is where examples live
+# examples_dir <- system.file("examples", package = "rODE")
+#
+# # get all the scripts that `App` in them
+# examples <- list.files(path = examples_dir, pattern = "*App", all.files = FALSE,
+#            full.names = FALSE, recursive = FALSE, ignore.case = FALSE,
+#            include.dirs = FALSE, no.. = FALSE)
 
 expected <- list(AdaptiveStepApp = list(
                     rowVector = list(s1 = 9.910181, s2 = 2.697124, t=6.635591),
@@ -107,29 +107,66 @@ expected <- list(AdaptiveStepApp = list(
 
 ) # end of list for expected values
 
-# loop to open each file
-goDebug <- FALSE
-nmax <- 0
-if (goDebug) {
-    nmax <- 20
-    examples <- examples[1:nmax]          # reduce the list for debugging
+examples <- rODE:::get_list_examples(aPackage = "rODE")
+
+
+loop_on_examples <- function(goDebug = FALSE) {
+    examples <- rODE:::get_list_examples(aPackage = "rODE")
+    # loop to open each file
+    # goDebug <- FALSE
+    nmax <- 0
+    if (goDebug) {
+        nmax <- 20
+        examples <- examples[1:nmax]          # reduce the list for debugging
+    }
+    i <- 1
+    for (app in examples) {
+        application <- sub("\\.R$", '', app)
+        cat(sprintf("\n %3d testing ... %30s", i, app))
+        source(paste(system.file("examples", package = "rODE"), app, sep ="/"))
+        result  <- do.call(application, list(FALSE))
+        .result <- as.list(result[nrow(result),]);
+        cat(sprintf("%30s", names(expected[application])))
+        # if ((goDebug) && (names(expected[application]) == "VanderpolMuTimeControlApp")) {
+        if (goDebug) {
+            cat("\n");
+            print(.result)}
+        last_row <- expected[[application]]$rowVector
+        expect_equal(.result, last_row, tolerance = expected[[application]]$tolerance)
+        # cat(expected[[application]]$tolerance)
+        cat("\t tested")
+        i <- i + 1
+    }
+
 }
-i <- 1
-for (app in examples) {
-    application <- sub("\\.R$", '', app)
-    cat(sprintf("\n %3d testing ... %30s", i, app))
-    source(paste(system.file("examples", package = "rODE"), app, sep ="/"))
-    result  <- do.call(application, list(FALSE))
-    .result <- as.list(result[nrow(result),]);
-    cat(sprintf("%30s", names(expected[application])))
-    if ((goDebug) && (names(expected[application]) == "VanderpolMuTimeControlApp")) {
-        cat("\n");
-        print(.result)}
-    last_row <- expected[[application]]$rowVector
-    expect_equal(.result, last_row, tolerance = expected[[application]]$tolerance)
-    # cat(expected[[application]]$tolerance)
-    cat("\t tested")
-    i <- i + 1
-}
+
+loop_on_examples(goDebug = FALSE)
+
+
+
+# # loop to open each file
+# goDebug <- FALSE
+# nmax <- 0
+# if (goDebug) {
+#     nmax <- 20
+#     examples <- examples[1:nmax]          # reduce the list for debugging
+# }
+# i <- 1
+# for (app in examples) {
+#     application <- sub("\\.R$", '', app)
+#     cat(sprintf("\n %3d testing ... %30s", i, app))
+#     source(paste(system.file("examples", package = "rODE"), app, sep ="/"))
+#     result  <- do.call(application, list(FALSE))
+#     .result <- as.list(result[nrow(result),]);
+#     cat(sprintf("%30s", names(expected[application])))
+#     if ((goDebug) && (names(expected[application]) == "VanderpolMuTimeControlApp")) {
+#         cat("\n");
+#         print(.result)}
+#     last_row <- expected[[application]]$rowVector
+#     expect_equal(.result, last_row, tolerance = expected[[application]]$tolerance)
+#     # cat(expected[[application]]$tolerance)
+#     cat("\t tested")
+#     i <- i + 1
+# }
 
 

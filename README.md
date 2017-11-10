@@ -1,34 +1,52 @@
 
 <!-- README.md is generated from README.Rmd.  -->
-[![Rdoc](http://www.rdocumentation.org/badges/version/rODE)](http://www.rdocumentation.org/packages/rODE)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rODE)](https://cran.r-project.org/package=rODE) [![Travis-CI Build Status](https://travis-ci.org/f0nzie/rODE.svg?branch=develop)](https://travis-ci.org/f0nzie/rODE) [![Coverage Status](https://codecov.io/gh/f0nzie/rODE/branch/develop/graph/badge.svg)](https://codecov.io/gh/f0nzie/rODE)
 
 rODE
 ====
 
-The goal of `rODE` is to explore R and its `S4` classes and its differences with Java and Python classes while exploring physics simulations by solving ordinary differential equations (`ODE`).
+The goal of `rODE` is to explore `R` and its `S4` classes and its differences with Java and Python classes while exploring physics simulations by solving ordinary differential equations (`ODE`).
 
-This is not your typical black-box ODE solver. You really have to develop your ODE algorithm using any of the ODE solvers available. The objective is learning while doing.
+Motivation
+----------
 
-`rODE` has been inspired on the extraordinary physics library for computer simulations **OpenSourcePhyisics**. Take a look at <http://opensourcephysics.org>.
+This is not your typical black-box ODE solver. You really have to develop your ODE algorithm using any of the ODE solvers available in the package. The objective is learning while coding R, understanding the physics and using the math.
+
+`rODE` has been inspired on the extraordinary physics library for computer simulations **OpenSourcePhyisics**. Take a look at it at <http://opensourcephysics.org>. I highly recommend the book [An Introduction to Computer Simulation Methods: Applications To Physical Systems](https://www.compadre.org/OSP/items/detail.cfm?ID=7375), `(Gould, Tobochnik, and Christian, 2017)`. It has helped me a lot in understanding the physics behind ordinary differential equations. The book briliantly combines code, algorithms, math and physics.
+
+Additionally I have consulted these sources during the developing of the package `rODE`:
+
+-   The beatiful introduction to computers and numerical methods for petroleum engineering *"Using the Computer to Solve Petroleum Engineering Problems"* by Melvin Nobles", `(Nobles, 1974)`
+-   Some examples and analytical solutions were borrowed from *"Numerical Solution of Ordinary Differential Equations"*, `(Atkinson, Han, and Stewart, 2009)`.
+-   The paper *"Numerical Reservoir Simulation Using an Ordinary-Differential-Equations Integrator"*, `(Sincovec, 1975)`.
+-   The thesis *"Numerical Methods For Solution of Diﬀerential Equations"*, `(Ritschel, 2013)`.
+-   The paper "On Dormand-Prince Method" where I could learn about the Dormand-Prince ODE solver, `(Kimura, 2009)`.
+-   The paper "A Family of Embedded Runge-Kutta formulae", `(Dormand and Prince, 1980)`, where you can see the derivation of the ODE solver `RK-45`.
+-   The paper on solving ODEs in R `(Soetaert, Petzoldt, and Setzer, 2010)`.
+-   The paper *"Behind and beyond the Matlab ODE suite"* `(Ashino, Nagase, and Vaillancourt, 2000)`.
+
+ODE solvers in this package
+---------------------------
 
 The ODE solvers implemented in R so far:
 
 -   Euler
 -   Euler-Richardson
+-   Verlet
 -   RK4
 -   RK45, Dormand-Prince45
--   Verlet
 
 Installation
 ------------
 
-You can install the latest version of `rODE` from github with:
+You can install the latest development version of `rODE` from github with:
 
 ``` r
-devtools::install_github("f0nzie/rODE")
+# install from the *develop* branch
+devtools::install_github("f0nzie/rODE", ref = "develop")
 ```
 
-Or from `CRAN`:
+Or the `stable` version from `CRAN`:
 
 ``` r
 install.packages("rODE")
@@ -80,6 +98,22 @@ You can test all applications under the `examples` folder by running the script 
 Applications
 ============
 
+-   AdaptiveStepApp
+-   ComparisonRK45App
+-   FallingParticleODE
+-   KeplerApp
+-   KeplerEnergyApp
+-   LogisticApp
+-   PendulumApp
+-   PlanetApp
+-   ProjectileApp
+-   ReactionApp
+-   RigidBodyNXFApp
+-   SHOApp
+-   SpringRK4App
+-   VanderpolApp
+-   VanderpolMuTimeControlApp
+
 AdaptiveStepApp
 ---------------
 
@@ -109,13 +143,12 @@ AdaptiveStepApp <- function(verbose = FALSE) {
     }
     return(data.table::rbindlist(rowVector))
 }
-
 # run application
 solution <- AdaptiveStepApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png)
+![](man/figures/README-unnamed-chunk-5-1.png)
 
 ComparisonRK45App
 -----------------
@@ -134,9 +167,9 @@ importFromExamples("ODETest.R")
      ode_solver <- RK45(ode)                   # select the ODE solver
      ode_solver <- setStepSize(ode_solver, 1)      # set the step
      ode_solver <- setTolerance(ode_solver, 1e-8)  # set the tolerance
-     time <-  0
      rowVector <- vector("list")
-     i <- 1
+     time <-  0
+     i    <- 1
      while (time < 50) {
          rowVector[[i]] <- list(t  = ode_solver@ode@state[2],
                                 s1 = getState(ode_solver@ode)[1],
@@ -157,7 +190,7 @@ solution <- ComparisonRK45App()                          # run the example
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)
+![](man/figures/README-unnamed-chunk-6-1.png)
 
 FallingParticleODE
 ------------------
@@ -172,8 +205,8 @@ FallingParticleODEApp <- function(verbose = FALSE) {
     # initial values
     initial_y <- 10
     initial_v <- 0
-    dt <- 0.01
-    ball <- FallingParticleODE(initial_y, initial_v)
+    dt        <- 0.01
+    ball   <- FallingParticleODE(initial_y, initial_v)
     solver <- Euler(ball)                        # set the ODE solver
     solver <- setStepSize(solver, dt)            # set the step
     rowVector <- vector("list")
@@ -195,7 +228,7 @@ solution <- FallingParticleODEApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)
+![](man/figures/README-unnamed-chunk-7-1.png)
 
 KeplerApp
 ---------
@@ -210,15 +243,12 @@ library(rODE)
 importFromExamples("Kepler.R") # source the class Kepler
 
 KeplerApp <- function(verbose = FALSE) {
-
     # set the orbit into a predefined state.
-    r <- c(2, 0)                                   # orbit radius
-    v <- c(0, 0.25)                                # velocity
+    r  <- c(2, 0)                                   # orbit radius
+    v  <- c(0, 0.25)                                # velocity
     dt <- 0.1
-
     planet <- Kepler(r, v)
     solver <- RK45(planet)
-
     rowVector <- vector("list")
     i <- 1
     while (planet@state[5] <= 10) {
@@ -239,7 +269,7 @@ solution <- KeplerApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-6-1.png)
+![](man/figures/README-unnamed-chunk-8-1.png)
 
 KeplerEnergyApp
 ---------------
@@ -253,11 +283,11 @@ importFromExamples("KeplerEnergy.R") # source the class Kepler
 
 KeplerEnergyApp <- function(verbose = FALSE) {
     # initial values
-    x  <- 1
-    vx <- 0
-    y  <- 0
-    vy <- 2 * pi
-    dt <- 0.01
+    x   <- 1
+    vx  <- 0
+    y   <- 0
+    vy  <- 2 * pi
+    dt  <- 0.01
     tol <- 1e-3
     particle <- KeplerEnergy()
     particle <- init(particle, c(x, vx, y, vy, 0))
@@ -282,12 +312,11 @@ KeplerEnergyApp <- function(verbose = FALSE) {
     return(DT)
 }
 
-
 solution <- KeplerEnergyApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-7-1.png)
+![](man/figures/README-unnamed-chunk-9-1.png)
 
 LogisticApp
 -----------
@@ -302,7 +331,7 @@ LogisticApp <- function(verbose = FALSE) {
     vx <- 0
     r  <- 2        # Malthusian parameter (rate of maximum population growth)
     K  <- 10.0     # carrying capacity of the environment
-    dt   <- 0.01; tol  <- 1e-3; tmax <- 10
+    dt <- 0.01; tol  <- 1e-3; tmax <- 10
     population <- Logistic()
     population <- init(population, c(x, vx, 0), r, K)
     odeSolver <- Verlet(population)
@@ -311,7 +340,7 @@ LogisticApp <- function(verbose = FALSE) {
     rowVector <- vector("list")
     i <- 1
     while (getTime(population) <= tmax) {
-        rowVector[[i]] <- list(t = getTime(population),
+        rowVector[[i]] <- list(t  = getTime(population),
                                s1 = population@state[1],
                                s2 = population@state[2])
         population <- doStep(population)
@@ -325,7 +354,7 @@ solution <- LogisticApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-8-1.png)
+![](man/figures/README-unnamed-chunk-10-1.png)
 
 PendulumApp
 -----------
@@ -339,9 +368,9 @@ importFromExamples("Pendulum.R")      # source the class
 
 PendulumApp <- function(verbose = FALSE) {
     # initial values
-    theta <- 0.2
+    theta    <- 0.2
     thetaDot <- 0
-    dt <- 0.1
+    dt       <- 0.1
     ode <- new("ODE")
     pendulum <- Pendulum()
     pendulum@state[3] <- 0      # set time to zero, t = 0
@@ -351,8 +380,8 @@ PendulumApp <- function(verbose = FALSE) {
     rowvec <- vector("list")
     i <- 1
     while (pendulum@state[3] <= 40)    {
-        rowvec[[i]] <- list(t  = pendulum@state[3],    # time
-                            theta = pendulum@state[1], # angle
+        rowvec[[i]] <- list(t     = pendulum@state[3],    # time
+                            theta = pendulum@state[1],    # angle
                             thetadot = pendulum@state[2]) # derivative of angle
         pendulum <- step(pendulum)
         i <- i + 1
@@ -365,7 +394,7 @@ solution <- PendulumApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-9-1.png)
+![](man/figures/README-unnamed-chunk-11-1.png)
 
 PlanetApp
 ---------
@@ -402,7 +431,6 @@ PlanetApp <- function(verbose = FALSE) {
     DT <- data.table::rbindlist(rowvec)
     return(DT)
 }
-
 # run the application
 solution <- PlanetApp()
 select_rows <- seq(1, nrow(solution), 10)      # do not overplot
@@ -410,7 +438,7 @@ solution <- solution[select_rows,]
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-10-1.png)
+![](man/figures/README-unnamed-chunk-12-1.png)
 
 ProjectileApp
 -------------
@@ -427,7 +455,6 @@ ProjectileApp <- function(verbose = FALSE) {
     x <- 0; vx <- 10; y <- 0; vy <- 10
     state <- c(x, vx, y, vy, 0)                        # state vector
     dt <- 0.01
-
     projectile <- Projectile()
     projectile <- setState(projectile, x, vx, y, vy)
     projectile@odeSolver <- init(projectile@odeSolver, 0.123)
@@ -435,7 +462,7 @@ ProjectileApp <- function(verbose = FALSE) {
     rowV <- vector("list")
     i <- 1
     while (projectile@state[3] >= 0)    {
-        rowV[[i]] <- list(t = projectile@state[5],
+        rowV[[i]] <- list(t  = projectile@state[5],
                           x  = projectile@state[1],
                           vx = projectile@state[2],
                           y  = projectile@state[3],     # vertical position
@@ -451,7 +478,7 @@ solution <- ProjectileApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-11-1.png)
+![](man/figures/README-unnamed-chunk-13-1.png)
 
 ReactionApp
 -----------
@@ -465,9 +492,8 @@ library(rODE)
 importFromExamples("Reaction.R")      # source the class
 
 ReactionApp <- function(verbose = FALSE) {
-    X <- 1; Y <- 5;
+    X  <- 1; Y <- 5;
     dt <- 0.1
-
     reaction <- Reaction(c(X, Y, 0))
     solver <- RK4(reaction)
     rowvec <- vector("list")
@@ -487,7 +513,7 @@ solution <- ReactionApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-12-1.png)
+![](man/figures/README-unnamed-chunk-14-1.png)
 
 RigidBodyNXFApp
 ---------------
@@ -505,8 +531,7 @@ RigidBodyNXFApp <- function(verbose = FALSE) {
     y1 <- 0   # initial y1 value
     y2 <- 1    # initial y2 value
     y3 <- 1    # initial y3 value
-    dt        <- 0.01 # delta time for step
-
+    dt <- 0.01 # delta time for step
     body <- RigidBodyNXF(y1, y2, y3)
     solver <- Euler(body)
     solver <- setStepSize(solver, dt)
@@ -531,7 +556,7 @@ solution <- RigidBodyNXFApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-13-1.png)
+![](man/figures/README-unnamed-chunk-15-1.png)
 
 SHOApp
 ------
@@ -565,7 +590,7 @@ solution <- SHOApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-14-1.png)
+![](man/figures/README-unnamed-chunk-16-1.png)
 
 SpringRK4App
 ------------
@@ -605,7 +630,7 @@ solution <- SpringRK4App()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-15-1.png)
+![](man/figures/README-unnamed-chunk-17-1.png)
 
 VanderpolApp
 ------------
@@ -626,7 +651,7 @@ VanderpolApp <- function(verbose = FALSE) {
     rowVector <- vector("list")
     i <- 1
     while (rigid_body@state[3] <= 20) {
-        rowVector[[i]] <- list(t =  rigid_body@state[3],
+        rowVector[[i]] <- list(t  = rigid_body@state[3],
                                y1 = rigid_body@state[1],
                                y2 = rigid_body@state[2])
         solver <- step(solver)
@@ -636,13 +661,12 @@ VanderpolApp <- function(verbose = FALSE) {
     DT <- data.table::rbindlist(rowVector)
     return(DT)
 }
-
 # show solution
 solution <- VanderpolApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-16-1.png)
+![](man/figures/README-unnamed-chunk-18-1.png)
 
 VanderpolMuTimeControlApp
 -------------------------
@@ -664,7 +688,7 @@ VanderpolMuTimeControlApp <- function(verbose = FALSE) {
     rowVector <- vector("list")
     i <- 1
     while (rigid_body@state[3] <= tmax) {
-        rowVector[[i]] <- list(t =  rigid_body@state[3],
+        rowVector[[i]] <- list(t  = rigid_body@state[3],
                                y1 = rigid_body@state[1],
                                y2 = rigid_body@state[2]
                                )
@@ -681,4 +705,27 @@ solution <- VanderpolMuTimeControlApp()
 plot(solution)
 ```
 
-![](man/figures/README-unnamed-chunk-17-1.png)
+![](man/figures/README-unnamed-chunk-19-1.png)
+
+References
+----------
+
+The following books and papers were consulted during the development of this package:
+
+\[1\] R. Ashino, M. Nagase and R. Vaillancourt. "Behind and beyond the Matlab ODE suite". In: *Computers & Mathematics with Applications* 40.4-5 (Aug. 2000), pp. 491-512. DOI: 10.1016/s0898-1221(00)00175-9.
+
+\[2\] K. Atkinson, W. Han and D. E. Stewart. *Numerical Solution of Ordinary Differential Equations*. Wiley, 2009. ISBN: 978-0-470-04294-6.
+
+\[3\] J. R. Dormand and P. J. Prince. "A family of embedded Runge-Kutta formulae". In: *Journal of computational and applied mathematics* 6.1 (Mar. 1980), pp. 19-26. DOI: 10.1016/0771-050x(80)90013-3.
+
+\[4\] H. Gould, J. Tobochnik and W. Christian. *An Introduction to Computer Simulation Methods: Applications To Physical Systems*. CreateSpace Independent Publishing Platform, 2017. ISBN: 978-1974427475.
+
+\[5\] T. Kimura. "On dormand-prince method". In: *Retrieved April* 27 (2009), p. 2014. &lt;URL: <http://depa.fquim.unam.mx/amyd/archivero/DormandPrince_19856.pdf>&gt;.
+
+\[6\] M. A. Nobles. *Using the Computer to Solve Petroleum Engineering Problems*. Gulf Publishing Co, 1974. ISBN: 978-0872018860.
+
+\[7\] T. Ritschel. "Numerical Methods For Solution of Di<U+FB00>erential Equations". Cand. thesis. DTU supervisor: John Bagterp Jørgensen, <jbjo@dtu.dk>, DTU Compute. Technical University of Denmark, Department of Applied Mathematics and Computer Science, 2013, p. 224. &lt;URL: <http://www.compute.dtu.dk/English.aspx>&gt;.
+
+\[8\] R. Sincovec. "Numerical Reservoir Simulation Using an Ordinary-Differential-Equations Integrator". In: *Society of Petroleum Engineers Journal* 15.03 (Jun. 1975), pp. 255-264. DOI: 10.2118/5104-pa.
+
+\[9\] K. Soetaert, T. Petzoldt and R. W. Setzer. "Solving differential equations in R: package deSolve". In: *Journal of Statistical Software* 33 (2010).

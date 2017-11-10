@@ -2,7 +2,7 @@
 % Please edit documentation in R/ode_generics.R
 \name{getEnergy}
 \alias{getEnergy}
-\title{Get the calculated energy level}
+\title{getEnergy}
 \usage{
 getEnergy(object, ...)
 }
@@ -61,6 +61,14 @@ setMethod("init", "KeplerEnergy", function(object, initState, ...) {
     object
 })
 
+
+setReplaceMethod("init", "KeplerEnergy", function(object, ..., value) {
+    initState <- value
+    object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+    object@counter <- 0
+    object
+})
 
 setMethod("getRate", "KeplerEnergy", function(object, state, ...) {
     # Computes the rate using the given state.

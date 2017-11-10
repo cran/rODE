@@ -2,7 +2,7 @@
 % Please edit documentation in R/ode_generics.R
 \name{getTime}
 \alias{getTime}
-\title{Get the elapsed time}
+\title{getTime}
 \usage{
 getTime(object, ...)
 }
@@ -26,17 +26,30 @@ LogisticApp <- function(verbose = FALSE) {
     r  <- 2        # Malthusian parameter (rate of maximum population growth)
     K  <- 10.0     # carrying capacity of the environment
     dt   <- 0.01; tol  <- 1e-3; tmax <- 10
-    population <- Logistic()
-    population <- init(population, c(x, vx, 0), r, K)
-    odeSolver <- Verlet(population)
-    odeSolver <- init(odeSolver, dt)
+
+    population <- Logistic()                # create a Logistic ODE object
+
+    # Two ways of initializing the object
+      # population <- init(population, c(x, vx, 0), r, K)
+    init(population) <-  list(initState = c(x, vx, 0),
+                              r = r,
+                              K = K)
+
+    odeSolver <- Verlet(population)        # select the solver
+
+    # Two ways of initializing the solver
+      # odeSolver <- init(odeSolver, dt)
+    init(odeSolver) <-  dt
+
     population@odeSolver <- odeSolver
+    # setSolver(population) <-  odeSolver
+
     rowVector <- vector("list")
     i <- 1
     while (getTime(population) <= tmax) {
         rowVector[[i]] <- list(t = getTime(population),
-                               s1 = population@state[1],
-                               s2 = population@state[2])
+                               s1 = getState(population)[1],
+                               s2 = getState(population)[2])
         population <- doStep(population)
         i <- i + 1
     }
@@ -92,6 +105,14 @@ setMethod("init", "KeplerEnergy", function(object, initState, ...) {
     object
 })
 
+
+setReplaceMethod("init", "KeplerEnergy", function(object, ..., value) {
+    initState <- value
+    object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+    object@counter <- 0
+    object
+})
 
 setMethod("getRate", "KeplerEnergy", function(object, state, ...) {
     # Computes the rate using the given state.

@@ -1,11 +1,9 @@
-#' RK4.R
-#'
-#' RK4 ODE solver
-#'
-
 
 #' RK4 class
 #'
+#' @param object internal passing object
+#' @param stepSize the size of the step
+#' @param value value for the step
 #' @rdname RK4-class
 #' @include AbstractODESolver.R
 #' @export
@@ -19,6 +17,14 @@
             contains = c("AbstractODESolver")
         )
 
+#' RK4 generic
+#'
+#' @rdname RK4-class
+#' @export
+#' @example ./inst/examples/Projectile.R
+#' @example ./inst/examples/PendulumApp.R
+setGeneric("RK4", function(ode, ...) standardGeneric("RK4"))
+
 
 setMethod("initialize", "RK4", function(.Object, ode, ...) {
     # initialize the class
@@ -27,7 +33,8 @@ setMethod("initialize", "RK4", function(.Object, ode, ...) {
 })
 
 
-#' @rdname init-method
+#' @rdname RK4-class
+#' @rdname init,init-methods
 #' @importFrom methods callNextMethod
 setMethod("init", "RK4", function(object, stepSize, ...) {
     # inititalize the solver
@@ -44,8 +51,21 @@ setMethod("init", "RK4", function(object, stepSize, ...) {
     object
 })
 
+#' @rdname RK4-class
+#' @importFrom methods callNextMethod
+setReplaceMethod("init", "RK4", function(object, ..., value) {
+    # initialize the solver
+    object <- callNextMethod(object, value)        # call superclass init
+    # set the rate vectors to the number of equations
+    object@rate1 <- vector("numeric", object@numEqn)  # make the rate vector
+    object@rate2 <- vector("numeric", object@numEqn)  # make the rate vector
+    object@rate3 <- vector("numeric", object@numEqn)  # make the rate vector
+    object@rate4 <- vector("numeric", object@numEqn)  # make the rate vector
+    object@estimated_state <- vector("numeric", object@numEqn)
+    object
+})
 
-#' @rdname step-method
+#' @rdname RK4-class
 setMethod("step", "RK4", function(object, ...) {
     # step through the differential equation solver
     state <- getState(object@ode)                         # get the state vector

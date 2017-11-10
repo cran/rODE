@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{importFromExamples}
 \alias{importFromExamples}
-\title{Source the R script}
+\title{importFromExamples}
 \usage{
 importFromExamples(aClassFile, aFolder = "examples")
 }

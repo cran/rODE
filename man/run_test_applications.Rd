@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{run_test_applications}
 \alias{run_test_applications}
-\title{Run test all the examples}
+\title{run_test_applications}
 \usage{
 run_test_applications()
 }

@@ -1,4 +1,5 @@
-## ------------------------------------------------------------------------
+## ----message=FALSE, results='hold'---------------------------------------
+library(rODE)
 # This code can also be found in the `examples` folder under this name:
 #
 # Pendulum.R
@@ -64,7 +65,7 @@ setMethod("getRate", "Pendulum", function(object, state, ...) {
 Pendulum <- function()  new("Pendulum")
 
 
-
+## ------------------------------------------------------------------------
 # #############
 # This code can also be found in the `examples` folder under this name:
 #

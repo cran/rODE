@@ -1,0 +1,218 @@
+
+
+
+For the differential equation:
+
+$$\dfrac{dy}{dt} = y + 2t$$
+the general analytical solution is:
+$$y(t) = C_1e^{t} - 2t - 2$$
+
+Find the errors given this initial condition: 
+$$y(0) = 1$$
+which allows to find:
+$$C_1 = 3$$
+
+
+```{r message=FALSE, results="hold"}
+library(rODE)
+
+setClass("MuskatTest", slots = c(
+    stack = "environment"           # environment object inside the class
+    ),
+    contains = c("ODE")
+    )
+
+setMethod("initialize", "MuskatTest", function(.Object, ...) {
+    .Object@stack$n <-  0               # "n" belongs to the class environment
+    .Object@state   <- c(1.0, 0.0)      # initial value
+    return(.Object)
+})
+
+setMethod("getExactSolution", "MuskatTest", function(object, t, ...) {
+    # analytical solution
+    return(3 * exp(t) - 2 *t - 2)       # constant C1 = 3 
+})
+
+setMethod("getState", "MuskatTest", function(object, ...) {
+    object@state
+})
+
+setMethod("getRate", "MuskatTest", function(object, state, ...) {
+    object@rate[1] <- state[1] + 2 * state[2]
+    object@rate[2] <-  1                        # rate of change of time, dt/dt
+    object@stack$n <-  object@stack$n + 1       # add 1 to the rate count
+    object@rate
+})
+
+# constructor
+MuskatTest <- function() {
+    odetest <- new("MuskatTest")
+    odetest
+}
+```
+
+## Euler
+
+```{r}
+ComparisonEulerApp <- function(stepSize) {
+    ode <- new("MuskatTest")
+    ode_solver <- Euler(ode)
+    ode_solver <- setStepSize(ode_solver, stepSize)
+    time <-  0
+    rowVector <- vector("list")
+    i <-  1
+    while (time < 5) {
+        state <- getState(ode_solver@ode)
+        time <- state[2]
+        error <- getExactSolution(ode_solver@ode, time) - state[1]
+        rowVector[[i]] <- list(step_size = stepSize, 
+                               t = time, 
+                               y_t = state[1], 
+                               exact = getExactSolution(ode_solver@ode, time),
+                               error = error, 
+                               rel_err = error / getExactSolution(ode_solver@ode, time),
+                               steps = ode_solver@ode@stack$n
+                               )
+        ode_solver <- step(ode_solver)
+        i <- i + 1
+    }
+    data.table::rbindlist(rowVector)
+}
+```
+
+```{r}
+# get a summary table for different step sizes
+get_table <- function(stepSize) {
+    dt <- ComparisonEulerApp(stepSize)
+    dt[round(t,1) %in% c(1.0, 2.0, 3.0, 4.0, 5.0)]
+}
+
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, get_table)
+data.table::rbindlist(dt_li)
+```
+
+## Using RK4
+
+```{r}
+ComparisonRK4App <- function(stepSize) {
+    ode <- new("MuskatTest")
+    ode_solver <- RK4(ode)
+    ode_solver <- setStepSize(ode_solver, stepSize)
+    time <-  0
+    rowVector <- vector("list")
+    i <-  1
+    while (time < 5) {
+        state <- getState(ode_solver@ode)
+        time  <- state[2]
+        error <- getExactSolution(ode_solver@ode, time) - state[1]
+        rowVector[[i]] <- list(step_size = stepSize, 
+                               t = time, 
+                               y_t = state[1], 
+                               exact = getExactSolution(ode_solver@ode, time),
+                               error = error, 
+                               rel_err = error / getExactSolution(ode_solver@ode, time),
+                               steps = ode_solver@ode@stack$n
+                               )
+        ode_solver <- step(ode_solver)
+        i <- i + 1
+    }
+    data.table::rbindlist(rowVector)
+}
+
+# get a summary table for different step sizes
+get_table <- function(stepSize) {
+    dt <- ComparisonRK4App(stepSize)
+    dt[round(t, 1) %in% c(1.0, 2.0, 3.0, 4.0, 5.0)]
+}
+
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, get_table)
+data.table::rbindlist(dt_li)
+```
+
+We see above that we are repeating code when the only parameter that is being changed is the ODE solver. In these cases is more convenient to use the function `ODESolverFactory`.
+
+
+## Using a solver factory
+
+```{r}
+ComparisonApp <- function(solver, stepSize) {
+    ode <- new("MuskatTest")
+    solver_factory <- ODESolverFactory()
+    ode_solver <- createODESolver(solver_factory, ode, solver)
+    ode_solver <- setStepSize(ode_solver, stepSize)
+    rowVector <- vector("list")
+    time <-  0
+    i <-  1
+    while (time < 5.001) {
+        state <- getState(ode_solver@ode)
+        time  <- state[2]
+        error <- getExactSolution(ode_solver@ode, time) - state[1]
+        rowVector[[i]] <- list(step_size = stepSize, 
+                               t = time, 
+                               y_t = state[1], 
+                               exact = getExactSolution(ode_solver@ode, time),
+                               error = error, 
+                               rel_err = error / getExactSolution(ode_solver@ode, time),
+                               steps = ode_solver@ode@stack$n
+                               )
+        ode_solver <- step(ode_solver)
+        time <- time + getStepSize(ode_solver)    # step size retrievd from ODE solver
+        i <- i + 1
+    }
+    data.table::rbindlist(rowVector)
+}
+
+# get a summary table for different step sizes
+create_table <- function(stepSize, solver) {
+    dt <- ComparisonApp(solver, stepSize)
+    # dt
+    dt[round(t, 1) %in% c(1.0, 2.0, 3.0, 4.0, 5.0)]
+}
+```
+
+### Euler
+```{r}
+# Create summary table for ODE solver Euler
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "Euler")
+data.table::rbindlist(dt_li)
+```
+
+### Verlet
+
+```{r}
+# Create summary table for ODE solver Verlet
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "Verlet")
+data.table::rbindlist(dt_li)
+```
+
+### Euler-Richardson
+```{r}
+# Create summary table for ODE solver EulerRichardson
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "EulerRichardson")
+data.table::rbindlist(dt_li)
+```
+
+### Runge-Kutta
+
+```{r}
+# Create summary table for ODE solver RK4
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "RK4")
+data.table::rbindlist(dt_li)
+```
+
+### Runge-Kutta 45
+
+```{r}
+# Create summary table for ODE solver RK45
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "RK45")
+data.table::rbindlist(dt_li)
+```
+
+

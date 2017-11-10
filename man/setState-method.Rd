@@ -2,9 +2,7 @@
 % Please edit documentation in R/ode_generics.R
 \name{setState}
 \alias{setState}
-\title{New setState that should work with different methods
- "theta", "thetaDot":  used in PendulumApp
- "x", "vx", "y", "vy": used in ProjectileApp}
+\title{setState}
 \usage{
 setState(object, ...)
 }
@@ -35,16 +33,20 @@ ProjectileApp <- function(verbose = FALSE) {
 
     projectile <- Projectile()
     projectile <- setState(projectile, x, vx, y, vy)
+
     projectile@odeSolver <- init(projectile@odeSolver, 0.123)
+
+    # init(projectile) <-  0.123
+
     projectile@odeSolver <- setStepSize(projectile@odeSolver, dt)
     rowV <- vector("list")
     i <- 1
-    while (projectile@state[3] >= 0)    {
-        rowV[[i]] <- list(t = projectile@state[5],
-                          x  = projectile@state[1],
-                          vx = projectile@state[2],
-                          y  = projectile@state[3],     # vertical position
-                          vy = projectile@state[4])
+    while (getState(projectile)[3] >= 0)    {
+        rowV[[i]] <- list(t  = getState(projectile)[5],
+                          x  = getState(projectile)[1],
+                          vx = getState(projectile)[2],
+                          y  = getState(projectile)[3],     # vertical position
+                          vy = getState(projectile)[4])
         projectile <- step(projectile)
         i <- i + 1
     }
@@ -67,18 +69,17 @@ PendulumApp <- function(verbose = FALSE) {
     theta <- 0.2
     thetaDot <- 0
     dt <- 0.1
-    ode <- new("ODE")
     pendulum <- Pendulum()
-    pendulum@state[3] <- 0      # set time to zero, t = 0
+    # pendulum@state[3] <- 0      # set time to zero, t = 0
     pendulum <- setState(pendulum, theta, thetaDot)
     pendulum <- setStepSize(pendulum, dt = dt) # using stepSize in RK4
     pendulum@odeSolver <- setStepSize(pendulum@odeSolver, dt) # set new step size
     rowvec <- vector("list")
     i <- 1
-    while (pendulum@state[3] <= 40)    {
-        rowvec[[i]] <- list(t  = pendulum@state[3],    # time
-                            theta = pendulum@state[1], # angle
-                            thetadot = pendulum@state[2]) # derivative of angle
+    while (getState(pendulum)[3] <= 40)    {
+        rowvec[[i]] <- list(t        = getState(pendulum)[3],    # time
+                            theta    = getState(pendulum)[1], # angle
+                            thetadot = getState(pendulum)[2]) # derivative of angle
         pendulum <- step(pendulum)
         i <- i + 1
     }

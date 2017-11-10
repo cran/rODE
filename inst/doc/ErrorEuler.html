@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Alfonso R. Reyes" />
+
+<meta name="date" content="2017-11-09" />
+
+<title>Error vs step size with Euler method</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Error vs step size with Euler method</h1>
+<h4 class="author"><em>Alfonso R. Reyes</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
+
+
+
+<div id="a-challenge" class="section level2">
+<h2>A challenge</h2>
+<p>Given the differential equation:</p>
+<p><span class="math display">\[ \frac {dy} {dx} = x + y \]</span></p>
+<p>Use the Euler ODE solver to find the error between the exact solution given by:</p>
+<p><span class="math display">\[ y(x) = e^e - x - 1\]</span></p>
+<p>at these step sizes: 1, 0.5, 0.25, 0.1, 0.01, 0.001, 0.0001; and plot the the step size versus the error when the <span class="math inline">\(x = 1\)</span>.</p>
+</div>
+<div id="build-the-ode-solver" class="section level2">
+<h2>Build the ODE solver</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rODE)
+<span class="kw">library</span>(ggplot2)
+
+<span class="kw">setClass</span>(<span class="st">&quot;EulerError&quot;</span>, <span class="dt">slots =</span> <span class="kw">c</span>(
+    <span class="dt">stack =</span> <span class="st">&quot;environment&quot;</span>           <span class="co"># environment object inside the class</span>
+    ),
+    <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
+    )
+
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;EulerError&quot;</span>, <span class="cf">function</span>(.Object, ...) {
+    .Object<span class="op">@</span>stack<span class="op">$</span>n &lt;-<span class="st">  </span><span class="dv">0</span>               <span class="co"># &quot;n&quot; belongs to the class environment</span>
+    .Object<span class="op">@</span>state   &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">1</span>)
+    <span class="kw">return</span>(.Object)
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getExactSolution&quot;</span>, <span class="st">&quot;EulerError&quot;</span>, <span class="cf">function</span>(object, t, ...) {
+    <span class="co"># analytical solution</span>
+    <span class="kw">return</span>(<span class="kw">exp</span>(t) <span class="op">-</span><span class="st"> </span>t <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;EulerError&quot;</span>, <span class="cf">function</span>(object, ...) {
+    object<span class="op">@</span>state
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;EulerError&quot;</span>, <span class="cf">function</span>(object, state, ...) {
+    object<span class="op">@</span>rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>state[<span class="dv">2</span>]      <span class="co"># x + y</span>
+    object<span class="op">@</span>rate[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="dv">1</span>                        <span class="co"># dx/dx</span>
+    object<span class="op">@</span>stack<span class="op">$</span>n &lt;-<span class="st"> </span>object<span class="op">@</span>stack<span class="op">$</span>n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>       <span class="co"># add 1 to the rate count</span>
+    object<span class="op">@</span>rate
+})
+
+<span class="co"># constructor</span>
+EulerError &lt;-<span class="st"> </span><span class="cf">function</span>(y) {
+    .EulerError &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;EulerError&quot;</span>)
+    .EulerError<span class="op">@</span>state[<span class="dv">1</span>] =<span class="st"> </span>y        <span class="co"># y </span>
+    .EulerError<span class="op">@</span>state[<span class="dv">2</span>] =<span class="st"> </span><span class="dv">0</span>        <span class="co"># x = t</span>
+    <span class="kw">return</span>(.EulerError)
+}</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;
+## [1] &quot;getExactSolution&quot;
+## [1] &quot;getState&quot;
+## [1] &quot;getRate&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># class implementation</span>
+EulerErrorApp &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">stepSize =</span> <span class="fl">0.1</span>) {
+    initial_y &lt;-<span class="st"> </span><span class="dv">0</span>
+    xmax      &lt;-<span class="st"> </span><span class="dv">1</span>
+    stepSize  &lt;-<span class="st"> </span>stepSize
+    n_steps   &lt;-<span class="st"> </span><span class="kw">as.integer</span>((xmax <span class="op">+</span><span class="st"> </span>stepSize <span class="op">/</span><span class="st"> </span><span class="dv">2</span>) <span class="op">/</span><span class="st"> </span>stepSize)
+    
+    ode        &lt;-<span class="st"> </span><span class="kw">EulerError</span>(initial_y)
+    ode_solver &lt;-<span class="st"> </span><span class="kw">Euler</span>(ode)
+    ode_solver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(ode_solver, stepSize)
+    
+    steps &lt;-<span class="st"> </span><span class="dv">0</span>
+    rowVector &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>)
+    i &lt;-<span class="st">  </span><span class="dv">1</span>
+    <span class="cf">while</span> (steps <span class="op">&lt;</span><span class="st"> </span>n_steps) {
+        ode_solver &lt;-<span class="st"> </span><span class="kw">step</span>(ode_solver)
+        state      &lt;-<span class="st"> </span><span class="kw">getState</span>(ode_solver<span class="op">@</span>ode)
+        steps      &lt;-<span class="st"> </span>ode_solver<span class="op">@</span>ode<span class="op">@</span>stack<span class="op">$</span>n
+        rowVector[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(
+                            <span class="dt">x =</span> state[<span class="dv">2</span>],     <span class="co"># x = t</span>
+                            <span class="dt">y =</span> state[<span class="dv">1</span>],     <span class="co"># y</span>
+                            <span class="dt">TrueY =</span> <span class="kw">getExactSolution</span>(ode_solver<span class="op">@</span>ode, state[<span class="dv">2</span>]),
+                            <span class="dt">steps =</span> steps)
+        i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+    }
+    data.table<span class="op">::</span><span class="kw">rbindlist</span>(rowVector)
+}</code></pre></div>
+</div>
+<div id="calculate-the-error-for-each-step-size" class="section level2">
+<h2>Calculate the error for each step size</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get the error at the last row of the dataframe</span>
+df &lt;-<span class="st"> </span><span class="kw">EulerErrorApp</span>(<span class="dt">stepSize =</span> <span class="fl">0.1</span>)
+last_row &lt;-<span class="st"> </span>df[<span class="kw">nrow</span>(df),]
+error &lt;-<span class="st"> </span>(last_row<span class="op">$</span>TrueY <span class="op">-</span><span class="st"> </span>last_row<span class="op">$</span>y) <span class="op">/</span><span class="st"> </span>last_row<span class="op">$</span>TrueY
+
+<span class="co"># function that gets the error for different step sizes</span>
+get_error &lt;-<span class="st"> </span><span class="cf">function</span>(stepSize) {
+    df &lt;-<span class="st"> </span><span class="kw">EulerErrorApp</span>(stepSize)
+    last_row &lt;-<span class="st"> </span>df[<span class="kw">nrow</span>(df),]
+    error &lt;-<span class="st"> </span>(last_row<span class="op">$</span>TrueY <span class="op">-</span><span class="st"> </span>last_row<span class="op">$</span>y) <span class="op">/</span><span class="st"> </span>last_row<span class="op">$</span>TrueY
+    <span class="kw">c</span>(<span class="dt">step =</span> stepSize, <span class="dt">odeY =</span> last_row<span class="op">$</span>y ,<span class="dt">TrueY =</span> last_row<span class="op">$</span>TrueY, <span class="dt">error =</span> error, <span class="dt">n_steps =</span> last_row<span class="op">$</span>steps)
+}
+
+step_sizes &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="fl">0.1</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>, <span class="fl">0.0001</span>)
+errors &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">t</span>(<span class="kw">sapply</span>(step_sizes, get_error)))
+errors</code></pre></div>
+<pre><code>##     step      odeY     TrueY        error n_steps
+## 1 1.0000 0.0000000 0.7182818 1.0000000000       1
+## 2 0.5000 0.2500000 0.7182818 0.6519472022       2
+## 3 0.2500 0.4414062 0.7182818 0.3854692789       4
+## 4 0.1000 0.5937425 0.7182818 0.1733851024      10
+## 5 0.0100 0.7048138 0.7182818 0.0187502990     100
+## 6 0.0010 0.7169239 0.7182818 0.0018904783    1000
+## 7 0.0001 0.7181459 0.7182818 0.0001892038   10000</code></pre>
+</div>
+<div id="plot-the-errors-vs-step-size" class="section level2">
+<h2>Plot the errors vs step size</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">ggplot</span>(errors, <span class="kw">aes</span>(step_sizes, error)) <span class="op">+</span>
+<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_line</span>()<span class="op">+</span>
+<span class="st"> </span><span class="kw">scale_x_log10</span>(
+   <span class="dt">breaks =</span> scales<span class="op">::</span><span class="kw">trans_breaks</span>(<span class="st">&quot;log10&quot;</span>, <span class="cf">function</span>(x) <span class="dv">10</span><span class="op">^</span>x),
+   <span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">trans_format</span>(<span class="st">&quot;log10&quot;</span>, scales<span class="op">::</span><span class="kw">math_format</span>(<span class="dv">10</span><span class="op">^</span>.x))
+ ) <span class="op">+</span>
+<span class="st"> </span><span class="kw">scale_y_log10</span>(
+   <span class="dt">breaks =</span> scales<span class="op">::</span><span class="kw">trans_breaks</span>(<span class="st">&quot;log10&quot;</span>, <span class="cf">function</span>(x) <span class="dv">10</span><span class="op">^</span>x),
+   <span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">trans_format</span>(<span class="st">&quot;log10&quot;</span>, scales<span class="op">::</span><span class="kw">math_format</span>(<span class="dv">10</span><span class="op">^</span>.x))
+ ) <span class="op">+</span>
+<span class="st"> </span><span class="kw">theme_bw</span>()
+a <span class="op">+</span><span class="st"> </span><span class="kw">annotation_logticks</span>(<span class="dt">sides =</span> <span class="st">&quot;lrbt&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">theme</span>(<span class="dt">panel.grid.minor =</span> <span class="kw">element_blank</span>())   <span class="co"># hide the minor grids</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="plot-the-number-of-steps-vs.step-size" class="section level2">
+<h2>Plot the number of steps vs. step size</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">ggplot</span>(errors, <span class="kw">aes</span>(n_steps, step_sizes)) <span class="op">+</span>
+<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_line</span>()<span class="op">+</span>
+<span class="st"> </span><span class="kw">scale_x_log10</span>(
+   <span class="dt">breaks =</span> scales<span class="op">::</span><span class="kw">trans_breaks</span>(<span class="st">&quot;log10&quot;</span>, <span class="cf">function</span>(x) <span class="dv">10</span><span class="op">^</span>x),
+   <span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">trans_format</span>(<span class="st">&quot;log10&quot;</span>, scales<span class="op">::</span><span class="kw">math_format</span>(<span class="dv">10</span><span class="op">^</span>.x))
+ ) <span class="op">+</span>
+<span class="st"> </span><span class="kw">scale_y_log10</span>(
+   <span class="dt">breaks =</span> scales<span class="op">::</span><span class="kw">trans_breaks</span>(<span class="st">&quot;log10&quot;</span>, <span class="cf">function</span>(x) <span class="dv">10</span><span class="op">^</span>x),
+   <span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">trans_format</span>(<span class="st">&quot;log10&quot;</span>, scales<span class="op">::</span><span class="kw">math_format</span>(<span class="dv">10</span><span class="op">^</span>.x))
+ ) <span class="op">+</span>
+<span class="st"> </span><span class="kw">theme_bw</span>()
+a <span class="op">+</span><span class="st"> </span><span class="kw">annotation_logticks</span>(<span class="dt">sides =</span> <span class="st">&quot;lrbt&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">theme</span>(<span class="dt">panel.grid.minor =</span> <span class="kw">element_blank</span>())   <span class="co"># hide the minor grids</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

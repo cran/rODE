@@ -1,8 +1,8 @@
 # utils.R
 
-#' Get the methods in a class
+#' showMethods2
 #'
-#' But only those specific to the class
+#' Get the methods in a class. But only those specific to the class
 #'
 #' @param theClass class to analyze
 #'
@@ -22,7 +22,8 @@ showMethods2 <- function(theClass) {
     # expect_equal(fvec, c("getStepSize", "init", "setStepSize", "step"))
 }
 
-
+#' importFromExamples
+#'
 #' Source the R script
 #'
 #' @param aClassFile a file containing one or more classes
@@ -35,7 +36,8 @@ importFromExamples <- function(aClassFile, aFolder = "examples") {
 }
 
 
-
+#' run_test_applications
+#'
 #' Run test all the examples
 #'
 #' @export
@@ -52,3 +54,16 @@ release_questions <- function() {
         "Do the examples have App in them?"
     )
 }
+
+
+
+get_list_examples <- function(aPackage) {
+    # this is where examples live
+    examples_dir <- system.file("examples", package = aPackage)
+
+    # get all the scripts that `App` in them
+    list.files(path = examples_dir, pattern = "*App", all.files = FALSE,
+                           full.names = FALSE, recursive = FALSE, ignore.case = FALSE,
+                           include.dirs = FALSE, no.. = FALSE)
+}
+

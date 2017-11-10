@@ -2,7 +2,7 @@
 % Please edit documentation in R/ode_generics.R
 \name{getRateCounts}
 \alias{getRateCounts}
-\title{Get the number of times that the rate has been calculated}
+\title{getRateCounts}
 \usage{
 getRateCounts(object, ...)
 }

@@ -1,0 +1,17 @@
+AdaptiveStepApp   Adaptive step example using RK45 ODE solver.
+CompareRK45App   Compares the solution by the RK45 ODE solver versus the analytical solution.
+CompareRK45ODEApp   Updates the ODE state instead of using the internal state in the ODE solver. Also plots the solver solution versus the analytical solution at a tolerance of 1e-6.
+FallingParticleApp   Application that simulates the free fall of a ball using Euler ODE solver.
+KeplerApp   Solves an inverse-square law model (Kepler model) using an adaptive stepsize algorithm. Application showing two planet orbiting.
+KeplerDormandPrince45App   Demonstration of the use of ODE solver RK45 for a particle subjected to a inverse-law force. The difference with the example KeplerApp is we are seeing the effect in thex and y axis on the particle. The original routine used the Verlet ODE solver.
+KeplerEnergyApp   Demonstration of the use of the Verlet ODE solver.
+LogisticApp   Simulates the logistic equation.
+PendulumApp   Simulation of a pendulum using the EulerRichardson ODE solver.
+PendulumEulerApp   Pendulum simulation with the Euler ODE solver, Notice how Euler is not applicable in this case as it diverges very quickly even when it is using a very small delta-t ODE.
+PlanetApp   Simulation of Earth orbiting around the Sun using the Euler ODE solver.
+ProjectileApp   Simulation with RK4 originally uses Euler ODE solver.
+ReactionApp   Solves an autocatalytic oscillating chemical reaction (Brusselator model) using a fourth-order Runge-Kutta algorithm.
+RigidBodyNXFApp   Example of a non-stiff system is the system of equations describing the motion of a rigid body without external forces.
+SHOApp   Single Harmonic Oscillator simulation that uses DormandPrince45 solver along with a ODE selector ODESolverFactory.
+SpringRK4App   Simulation of a spring considering no friction using the Runge-Kutta ODE solver.
+VanderpolMuTimeControlApp   This is a modification of the original Vanderpol.R script. In this version, we will add tha ability of setting mu and time lapse. This example is also shown in the Matlab help guide.

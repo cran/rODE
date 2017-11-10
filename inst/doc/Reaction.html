@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vignette Author" />
 
-<meta name="date" content="2017-07-12" />
+<meta name="date" content="2017-11-09" />
 
 <title>Chemical Reaction</title>
 
@@ -70,13 +70,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Chemical Reaction</h1>
 <h4 class="author"><em>Vignette Author</em></h4>
-<h4 class="date"><em>2017-07-12</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
 
 
 
-<div id="reaction-with-rk4-solver" class="section level2">
-<h2>Reaction with RK4 solver</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<div id="build-the-reaction-class-with-a-rk4-solver" class="section level2">
+<h2>Build the Reaction class with a RK4 solver</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rODE)
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co"># Reaction.R</span>
 
 <span class="co"># /**</span>
@@ -87,7 +88,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co"># * Converted to R by: Alfonso R. Reyes</span>
 <span class="co">#</span>
 <span class="co"># */</span>
-
 
 <span class="kw">setClass</span>(<span class="st">&quot;Reaction&quot;</span>, <span class="dt">slots =</span> <span class="kw">c</span>(
     <span class="dt">k1 =</span> <span class="st">&quot;numeric&quot;</span>,
@@ -107,55 +107,64 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
     )
 
+<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Reaction&quot;</span>, <span class="cf">function</span>(object) {
+    object<span class="op">@</span>state
+})
 
-<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Reaction&quot;</span>, function(object) {
-    object@state
-})</code></pre></div>
-<pre><code>## [1] &quot;getState&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Reaction&quot;</span>, function(object, state, ...) {
-    xxy &lt;-<span class="st"> </span>state[<span class="dv">1</span>] *<span class="st"> </span>state[<span class="dv">1</span>] *state[<span class="dv">2</span>]
-    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>object@k1 *<span class="st"> </span>object@A -<span class="st"> </span>object@k2 *<span class="st"> </span>object@B *<span class="st"> </span>state[<span class="dv">1</span>] +
-<span class="st">        </span>object@k3 *<span class="st"> </span>xxy -<span class="st"> </span>object@k4 *<span class="st"> </span>state[<span class="dv">1</span>]                          <span class="co"># X rate</span>
-    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>object@k2 *<span class="st"> </span>object@B *<span class="st"> </span>state[<span class="dv">1</span>] -<span class="st"> </span>object@k3 *<span class="st"> </span>xxy <span class="co"># Y rate</span>
-    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>                         <span class="co"># rate of change of time, dt/dt</span>
 
-    object@rate                                                <span class="co"># time derivative</span>
-})</code></pre></div>
-<pre><code>## [1] &quot;getRate&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># constructor</span>
-Reaction &lt;-<span class="st"> </span>function(initialConditions) {
+<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Reaction&quot;</span>, <span class="cf">function</span>(object, state, ...) {
+    xxy &lt;-<span class="st"> </span>state[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>] <span class="op">*</span>state[<span class="dv">2</span>]
+    object<span class="op">@</span>rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>object<span class="op">@</span>k1 <span class="op">*</span><span class="st"> </span>object<span class="op">@</span>A <span class="op">-</span><span class="st"> </span>object<span class="op">@</span>k2 <span class="op">*</span><span class="st"> </span>object<span class="op">@</span>B <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>] <span class="op">+</span>
+<span class="st">        </span>object<span class="op">@</span>k3 <span class="op">*</span><span class="st"> </span>xxy <span class="op">-</span><span class="st"> </span>object<span class="op">@</span>k4 <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>]                          <span class="co"># X rate</span>
+    object<span class="op">@</span>rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>object<span class="op">@</span>k2 <span class="op">*</span><span class="st"> </span>object<span class="op">@</span>B <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>object<span class="op">@</span>k3 <span class="op">*</span><span class="st"> </span>xxy <span class="co"># Y rate</span>
+    object<span class="op">@</span>rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>                         <span class="co"># rate of change of time, dt/dt</span>
+    object<span class="op">@</span>rate                                 <span class="co"># time derivative</span>
+})
+
+<span class="co"># constructor</span>
+Reaction &lt;-<span class="st"> </span><span class="cf">function</span>(initialConditions) {
     .Reaction &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;Reaction&quot;</span>)
-    .Reaction@state &lt;-<span class="st"> </span>initialConditions
+    .Reaction<span class="op">@</span>state &lt;-<span class="st"> </span>initialConditions
     .Reaction
-}
-
-
-<span class="co"># This code can also be found in the `examples` folder under this name:</span>
-<span class="co"># ReactionApp.R</span>
-<span class="co">#</span>
+}</code></pre></div>
+<pre><code>## [1] &quot;getState&quot;
+## [1] &quot;getRate&quot;</code></pre>
+</div>
+<div id="run-the-application-reactionapp" class="section level2">
+<h2>Run the application ReactionApp</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># +++++++++++++++++++++++++++++++++++++++++++++++++++ application: ReactionApp.R</span>
 <span class="co"># ReactionApp solves an autocatalytic oscillating chemical</span>
 <span class="co"># reaction (Brusselator model) using</span>
-<span class="co"># a fouth-order Runge-Kutta algorithm.</span>
-<span class="co">#</span>
-<span class="co">#</span>
-ReactionApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
-    
+<span class="co"># a fourth-order Runge-Kutta algorithm.</span>
+
+ReactionApp &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
     X &lt;-<span class="st"> </span><span class="dv">1</span>; Y &lt;-<span class="st"> </span><span class="dv">5</span>;
     dt &lt;-<span class="st"> </span><span class="fl">0.1</span>
-    
     reaction &lt;-<span class="st"> </span><span class="kw">Reaction</span>(<span class="kw">c</span>(X, Y, <span class="dv">0</span>))
-    solver &lt;-<span class="st"> </span><span class="kw">RK4</span>(reaction)
+    solver  &lt;-<span class="st"> </span><span class="kw">RK4</span>(reaction)
     
-    while (solver@ode@state[<span class="dv">3</span>] &lt;<span class="st"> </span><span class="dv">100</span>) {
-        if (verbose)
-            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f %12f </span><span class="ch">\n</span><span class="st">&quot;</span>, solver@ode@state[<span class="dv">1</span>],
-                    solver@ode@state[<span class="dv">2</span>], solver@ode@state[<span class="dv">3</span>]))
-        solver &lt;-<span class="st"> </span><span class="kw">step</span>(solver)
+    rowvec  &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>)
+    i &lt;-<span class="st"> </span><span class="dv">1</span>
+    <span class="cf">while</span> (<span class="kw">getState</span>(reaction)[<span class="dv">3</span>] <span class="op">&lt;</span><span class="st"> </span><span class="dv">100</span>) {             <span class="co"># stop at t = 100</span>
+        rowvec[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">t =</span> <span class="kw">getState</span>(reaction)[<span class="dv">3</span>],
+                            <span class="dt">X =</span> <span class="kw">getState</span>(reaction)[<span class="dv">1</span>],
+                            <span class="dt">Y =</span> <span class="kw">getState</span>(reaction)[<span class="dv">2</span>])
+        solver   &lt;-<span class="st"> </span><span class="kw">step</span>(solver)
+        reaction &lt;-<span class="st"> </span><span class="kw">getODE</span>(solver)
+        i &lt;-<span class="st">  </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
     }
-    <span class="co"># at t=100, dt=0.1,  c(2.131958,     1.105316,   100.000000)</span>
+    DT &lt;-<span class="st"> </span>data.table<span class="op">::</span><span class="kw">rbindlist</span>(rowvec)
+    <span class="kw">return</span>(DT)
 }
 
-<span class="kw">ReactionApp</span>()</code></pre></div>
+
+solution &lt;-<span class="st"> </span><span class="kw">ReactionApp</span>()
+<span class="kw">plot</span>(solution<span class="op">$</span>t, solution<span class="op">$</span>X)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(solution<span class="op">$</span>t, solution<span class="op">$</span>Y)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(solution<span class="op">$</span>X, solution<span class="op">$</span>Y)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 
 

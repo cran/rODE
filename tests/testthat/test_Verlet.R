@@ -1,4 +1,5 @@
 library(testthat)
+
 context("test Verlet")
 
 # add a class example to test Verlet  ++++++++++++++++++++++++++++++++++++++++++

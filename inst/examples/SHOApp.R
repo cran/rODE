@@ -1,21 +1,32 @@
+# This example uses ODESolverFactory
+
 importFromExamples("SHO.R")
 
 # SHOApp.R
 SHOApp <- function(...) {
     x <- 1.0; v <- 0; k <- 1.0; dt <- 0.01; tolerance <- 1e-3
     sho    <- SHO(x, v, k)
+
+    # Use ODESolverFactory
     solver_factory <- ODESolverFactory()
     solver <- createODESolver(solver_factory, sho, "DormandPrince45")
     # solver <- DormandPrince45(sho)                    # this can also be used
-    solver <- setTolerance(solver, tolerance)
-    solver <- init(solver, dt)
+
+    # Two ways of setting the tolerance
+    # solver <- setTolerance(solver, tolerance)           # or this below
+    setTolerance(solver) <-  tolerance
+
+    # Two ways of initializing the solver
+      # solver <- init(solver, dt)
+    init(solver) <- dt
+
     i <- 1; rowVector <- vector("list")
-    while (sho@state[3] <= 500) {
-        rowVector[[i]] <- list(x = sho@state[1],
-                               v = sho@state[2],
-                               t = sho@state[3])
+    while (getState(sho)[3] <= 500) {
+        rowVector[[i]] <- list(x = getState(sho)[1],
+                               v = getState(sho)[2],
+                               t = getState(sho)[3])
         solver <- step(solver)
-        sho    <- solver@ode
+        sho    <- getODE(solver)
         i <- i + 1
     }
     return(data.table::rbindlist(rowVector))

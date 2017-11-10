@@ -12,7 +12,7 @@
 
 <meta name="author" content="Wolfgang Christian / Alfonso R. Reyes" />
 
-<meta name="date" content="2017-07-12" />
+<meta name="date" content="2017-11-09" />
 
 <title>Falling Particle ODE</title>
 
@@ -70,12 +70,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Falling Particle ODE</h1>
 <h4 class="author"><em>Wolfgang Christian / Alfonso R. Reyes</em></h4>
-<h4 class="date"><em>2017-07-12</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
 
 
 
 <div id="the-fallingparticleode-class-using-the-euler-ode-solver" class="section level2">
-<h2>The FallingParticleODE class using the EUler ODE solver</h2>
+<h2>The FallingParticleODE class using the Euler ODE solver</h2>
 <p>Because this is free fall of a particle in one-dimension, for vertical motion, we use Newton’s second law:</p>
 <p><span class="math display">\[
 m \frac{d^2y} {dt^2} = F
@@ -100,7 +100,13 @@ r_1 = r_2 \\
 r_2 = -g  \\
 r_3 = 1
 \]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
+</div>
+<div id="build-the-fallingparticleode-class" class="section level2">
+<h2>Build the FallingParticleODE class</h2>
+<p>We don’t indicate the ODE solver at this time. That is done in the application in the next section.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rODE)
+
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co"># FallingParticleODE.R</span>
 <span class="co">#</span>
 
@@ -113,42 +119,45 @@ r_3 = 1
     <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
     )
 
-
-<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;FallingParticleODE&quot;</span>, function(.Object, ...) {
-    .Object@state &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">3</span>)
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;FallingParticleODE&quot;</span>, <span class="cf">function</span>(.Object, ...) {
+    .Object<span class="op">@</span>state &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">3</span>)
     <span class="kw">return</span>(.Object)
 })
 
-<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;FallingParticleODE&quot;</span>, function(object, ...) {
+<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;FallingParticleODE&quot;</span>, <span class="cf">function</span>(object, ...) {
     <span class="co"># Gets the state variables.</span>
-    <span class="kw">return</span>(object@state)
+    <span class="kw">return</span>(object<span class="op">@</span>state)
 })
 
-<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;FallingParticleODE&quot;</span>, function(object, state, ...) {
+<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;FallingParticleODE&quot;</span>, <span class="cf">function</span>(object, state, ...) {
     <span class="co"># Gets the rate of change using the argument's state variables.</span>
-    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]
-    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>-<span class="st"> </span>object@g
-    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>
+    object<span class="op">@</span>rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]
+    object<span class="op">@</span>rate[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="op">-</span><span class="st"> </span>object<span class="op">@</span>g
+    object<span class="op">@</span>rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>
     
-    object@rate
+    object<span class="op">@</span>rate
 })
 
 <span class="co"># constructor</span>
-FallingParticleODE &lt;-<span class="st"> </span>function(y, v) {
+FallingParticleODE &lt;-<span class="st"> </span><span class="cf">function</span>(y, v) {
     .FallingParticleODE &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;FallingParticleODE&quot;</span>)
-    .FallingParticleODE@state[<span class="dv">1</span>] &lt;-<span class="st"> </span>y
-    .FallingParticleODE@state[<span class="dv">2</span>] &lt;-<span class="st"> </span>v
-    .FallingParticleODE@state[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
+    .FallingParticleODE<span class="op">@</span>state[<span class="dv">1</span>] &lt;-<span class="st"> </span>y
+    .FallingParticleODE<span class="op">@</span>state[<span class="dv">2</span>] &lt;-<span class="st"> </span>v
+    .FallingParticleODE<span class="op">@</span>state[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
     .FallingParticleODE
-}
-
-
-<span class="co"># This code can also be found in the `examples` folder under this name:</span>
+}</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;
+## [1] &quot;getState&quot;
+## [1] &quot;getRate&quot;</code></pre>
+</div>
+<div id="run-the-application-fallingparticleodeapp" class="section level2">
+<h2>Run the application FallingParticleODEApp</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co"># </span>
 <span class="co"># FallingParticleODEApp.R</span>
 <span class="co">#</span>
 <span class="co">#</span>
-FallingParticleODEApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
+FallingParticleODEApp &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
     <span class="kw">library</span>(ggplot2)
     
     <span class="co"># load the R class that sets up the solver for this application</span>
@@ -166,47 +175,28 @@ FallingParticleODEApp &lt;-<span class="st"> </span>function(<span class="dt">ve
     rowVector &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>)
     i &lt;-<span class="st"> </span><span class="dv">1</span>
     <span class="co"># stop loop when the ball hits the ground</span>
-    while (ball@state[<span class="dv">1</span>] &gt;=<span class="st"> </span><span class="dv">0</span>) {
-        rowVector[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">state1 =</span> ball@state[<span class="dv">1</span>], 
-                               <span class="dt">state2 =</span> ball@state[<span class="dv">2</span>], 
-                               <span class="dt">state3 =</span> ball@state[<span class="dv">3</span>])
+    <span class="cf">while</span> (ball<span class="op">@</span>state[<span class="dv">1</span>] <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>) {
+        rowVector[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">state1 =</span> ball<span class="op">@</span>state[<span class="dv">1</span>], 
+                               <span class="dt">state2 =</span> ball<span class="op">@</span>state[<span class="dv">2</span>], 
+                               <span class="dt">state3 =</span> ball<span class="op">@</span>state[<span class="dv">3</span>])
         solver &lt;-<span class="st"> </span><span class="kw">step</span>(solver)
-        ball &lt;-<span class="st"> </span>solver@ode
-        if (verbose) {
-            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f &quot;</span>,  ball@state[<span class="dv">1</span>], ball@rate[<span class="dv">1</span>] ))
-            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f &quot;</span>,  ball@state[<span class="dv">2</span>], ball@rate[<span class="dv">2</span>] ))
-            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f</span><span class="ch">\n</span><span class="st">&quot;</span>, ball@state[<span class="dv">3</span>], ball@rate[<span class="dv">3</span>] ))
+        ball &lt;-<span class="st"> </span>solver<span class="op">@</span>ode
+        <span class="cf">if</span> (verbose) {
+            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f &quot;</span>,  ball<span class="op">@</span>state[<span class="dv">1</span>], ball<span class="op">@</span>rate[<span class="dv">1</span>] ))
+            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f &quot;</span>,  ball<span class="op">@</span>state[<span class="dv">2</span>], ball<span class="op">@</span>rate[<span class="dv">2</span>] ))
+            <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f</span><span class="ch">\n</span><span class="st">&quot;</span>, ball<span class="op">@</span>state[<span class="dv">3</span>], ball<span class="op">@</span>rate[<span class="dv">3</span>] ))
         }
-        i &lt;-<span class="st"> </span>i +<span class="st"> </span><span class="dv">1</span>
+        i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
     }
     
-    DT &lt;-<span class="st"> </span>data.table::<span class="kw">rbindlist</span>(rowVector)
-    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state1)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>))
-    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state2)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;red&quot;</span>))
+    DT &lt;-<span class="st"> </span>data.table<span class="op">::</span><span class="kw">rbindlist</span>(rowVector)
+    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>))
+    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;red&quot;</span>))
 }
 
 
 <span class="kw">FallingParticleODEApp</span>()</code></pre></div>
-</div>
-<div id="plots" class="section level2">
-<h2>Plots</h2>
-<p>The figure sizes have been customised so that you can easily put two images side-by-side.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ggplot(DT, aes(x = state3, y = state1)) + geom_line(col = &quot;blue&quot;)</span>
-<span class="co"># ggplot(DT, aes(x = state3, y = state2)) + geom_line(col = &quot;red&quot;)</span></code></pre></div>
-</div>
-<div id="data" class="section level2">
-<h2>Data</h2>
-<p>You can write math expressions, e.g. <span class="math inline">\(Y = X\beta + \epsilon\)</span>, footnotes<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, and tables, e.g. using <code>knitr::kable()</code>.</p>
-</div>
-<div id="the-fallingparticleode-application" class="section level2">
-<h2>The FallingParticleODE application</h2>
-<p>The complete R script can be found in the examples folder of this package. At the bottom of the document</p>
-</div>
-<div class="footnotes">
-<hr />
-<ol>
-<li id="fn1"><p>A footnote here.<a href="#fnref1">↩</a></p></li>
-</ol>
+<p><img src="data:image/png;base64,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" /><!-- --><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 
 

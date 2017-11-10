@@ -1,5 +1,6 @@
-# ode_generics.R
 
+#' getRateCounts
+#'
 #' Get the number of times that the rate has been calculated
 #'
 #' @param object a class object
@@ -10,72 +11,9 @@ setGeneric("getRateCounts", function(object, ...)
     standardGeneric("getRateCounts"))
 
 
-# Generic functions for constructors +++++++++++++++++++++++++++++++++++++++++
-#' @rdname AbstractODESolver-class
-#' @export
-#' @examples
-#' # This is how we start defining a new ODE solver: Euler
-#' .Euler <- setClass("Euler",              # Euler solver very simple; no slots
-#'      contains = c("AbstractODESolver"))
+
+#' getRate
 #'
-#'
-#'
-#' # Here we define the ODE solver Verlet
-#' .Verlet <- setClass("Verlet", slots = c(
-#'     rate1 = "numeric",                          # Verlet calculates two rates
-#'     rate2 = "numeric",
-#'     rateCounter = "numeric"),
-#' contains = c("AbstractODESolver"))
-#'
-#'
-#'
-#' # This is the definition of the ODE solver Runge-Kutta 4
-#' .RK4 <- setClass("RK4", slots = c(       # On the other hand RK4 uses 4 rates
-#'    rate1 = "numeric",
-#'    rate2 = "numeric",
-#'    rate3 = "numeric",
-#'    rate4 = "numeric",
-#'    estimated_state = "numeric"),         # and estimates another state
-#' contains = c("AbstractODESolver"))
-#'
-setGeneric("AbstractODESolver", function(ode, ...)
-    standardGeneric("AbstractODESolver"))
-
-
-#' @rdname EulerRichardson-class
-#' @export
-#' @example ./inst/examples/PendulumApp.R
-setGeneric("EulerRichardson", function(ode, ...)
-    standardGeneric("EulerRichardson"))
-
-
-#' @rdname RK4-class
-#' @export
-#' @example ./inst/examples/Projectile.R
-#' @example ./inst/examples/PendulumApp.R
-setGeneric("RK4", function(ode, ...)
-    standardGeneric("RK4"))
-
-
-#' @rdname Verlet-class
-#' @export
-#' @example ./inst/examples/LogisticApp.R
-setGeneric("Verlet", function(ode, ...)
-    standardGeneric("Verlet"))
-
-#' @rdname Euler-class
-#' @export
-#' @example ./inst/examples/RigidBodyNXFApp.R
-setGeneric("Euler", function(ode, ...)
-    standardGeneric("Euler"))
-
-#' @rdname ODESolverFactory-class
-#' @export
-#' @example ./inst/examples/SHOApp.R
-setGeneric("ODESolverFactory", function(...)
-    standardGeneric("ODESolverFactory"))
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 #' Get a new rate given a state
 #'
 #' @rdname getRate-method
@@ -87,6 +25,8 @@ setGeneric("ODESolverFactory", function(...)
 setGeneric("getRate", function(object, state, ...) standardGeneric("getRate"))
 
 
+#' getState
+#'
 #' Get current state of the system
 #'
 #' @param object a class object
@@ -98,7 +38,9 @@ setGeneric("getRate", function(object, state, ...) standardGeneric("getRate"))
 setGeneric("getState", function(object, ...) standardGeneric("getState"))
 
 
-#' Advances a step in the ODE solver
+#' step
+#'
+#' Advances a step within the ODE solver
 #'
 #' @param object a class object
 #' @param ... additional parameters
@@ -108,8 +50,31 @@ setGeneric("getState", function(object, ...) standardGeneric("getState"))
 setGeneric("step", function(object, ...) standardGeneric("step"))
 
 
+#' getODE
+#'
+#' Get the ODE status from the solver
+#'
+#' @param object a class object
+#' @param ... additional parameters
+#' @rdname getODE-method
+#' @export
+setGeneric("getODE", function(object, ...) standardGeneric("getODE"))
 
-#' Get the step size
+
+#' setSolver
+#'
+#' Set a solver over an ODE object
+#'
+#' @param object a class object
+#' @param value value to be set
+#' @rdname setSolver-method
+#' @export
+setGeneric("setSolver<-", function(object, value) {standardGeneric("setSolver<-")})
+
+
+#' getStepSize
+#'
+#' Get the current value of the step size
 #'
 #' @param object a class object
 #' @param ... additional parameters
@@ -120,6 +85,8 @@ setGeneric("getStepSize", function(object, ...) standardGeneric("getStepSize"))
 
 
 
+#' doStep
+#'
 #' Perform a step
 #'
 #' @param object a class object
@@ -131,14 +98,16 @@ setGeneric("getStepSize", function(object, ...) standardGeneric("getStepSize"))
 setGeneric("doStep", function(object, ...) standardGeneric("doStep"))
 
 
-
+#' init
+#'
 #' Set initial values before starting the ODE solver
 #'
+#' Sets the tolerance like this: solver <- init(solver, dt)
 #' Not all super classes require an init method.
 #'
 #' @param object a class object
 #' @param ... additional parameters
-#' @param stepSize size of the step
+#' @param value a value to set
 #' @rdname init-method
 #' @export
 #' @examples
@@ -171,15 +140,26 @@ setGeneric("doStep", function(object, ...) standardGeneric("doStep"))
 #' })
 setGeneric("init", function(object, ...) standardGeneric("init"))
 
+#' init<-
+#'
+#' Set initial values before starting the ODE solver
+#'
+#' Sets the tolerance like this: init(solver) <- dt
+#'
+#' @rdname init-method
+#' @export
+setGeneric("init<-", function(object, ..., value) standardGeneric("init<-"))
 
 
+#' setStepSize
+#'
 #' setStepSize uses either of two step parameters: stepSize and dt
-#' `stepSize`` works for most of the applications
-#' `dt`` is used in Pendulum
+#' stepSize works for most of the applications
+#' dt is used in Pendulum
 #'
 #' @param object a class object
 #' @param ... additional parameters
-#' @param stepSize size of the step
+#'
 #' @rdname setStepSize-method
 #' @export
 #' @example ./inst/examples/SpringRK4App.R
@@ -187,43 +167,68 @@ setGeneric("init", function(object, ...) standardGeneric("init"))
 setGeneric("setStepSize", function(object, ...) standardGeneric("setStepSize"))
 
 
-
+#' setState
+#'
 #' New setState that should work with different methods
 #'  "theta", "thetaDot":  used in PendulumApp
 #'  "x", "vx", "y", "vy": used in ProjectileApp
 #'
 #' @param object a class object
 #' @param ... additional parameters
+#'
+#' @rdname setState-method
 #' @export
 #' @example ./inst/examples/ProjectileApp.R
 #' @example ./inst/examples/PendulumApp.R
 setGeneric("setState", function(object, ...) standardGeneric("setState"))
 
 
-
+#' setTolerance
+#'
 #' Set the tolerance for the solver
 #'
+#' Sets the tolerance like this: odeSolver <- setTolerance(odeSolver, tol)
+#'
 #' @param object a class object
-#' @param ... additional parameters
 #' @param tol tolerance
+#'
 #' @rdname setTolerance-method
 #' @export
 #' @example ./inst/examples/ComparisonRK45App.R
 #' @example ./inst/examples/KeplerDormandPrince45App.R
 #' @example ./inst/examples/AdaptiveStepApp.R
-setGeneric("setTolerance", function(object, tol, ...)
-    standardGeneric("setTolerance"))
+setGeneric("setTolerance", function(object, tol) standardGeneric("setTolerance"))
 
 
+#' setTolerance<-
+#'
+#' Set the tolerance for the solver
+#'
+#' Sets the tolerance like this: setTolerance(odeSolver) <- tol
+#'
+#' @param ... additional parameters
+#' @param value a value to set
+#'
+#' @rdname setTolerance-method
+#' @export
+setGeneric("setTolerance<-", function(object, ..., value) standardGeneric("setTolerance<-"))
+
+
+#' getTolerance
+#'
 #' Get the tolerance for the solver
 #'
 #' @param object a class object
 #' @param ... additional parameters
+#'
 #' @rdname getTolerance-method
 #' @export
 setGeneric("getTolerance", function(object, ...) standardGeneric("getTolerance"))
 
 
+
+#' getErrorCode
+#'
 #' Get an error code
 #'
 #' @param object a class object
@@ -238,9 +243,17 @@ setGeneric("getTolerance", function(object, ...) standardGeneric("getTolerance")
 setGeneric("getErrorCode", function(object, tol, ...)
     standardGeneric("getErrorCode"))
 
+
+
+#' enableRuntimeExceptions
+#'
 #' Enable Runtime Exceptions
 #'
-#' @rdname DormandPrince45-class
+#' @param object a class object
+#' @param enable a boolean to enable exceptions
+#' @param ... additional parameters
+#'
+#' @rdname enableRuntimeExceptions-method
 #' @export
 #' @examples
 #' setMethod("enableRuntimeExceptions", "DormandPrince45", function(object, enable) {
@@ -249,21 +262,31 @@ setGeneric("getErrorCode", function(object, tol, ...)
 setGeneric("enableRuntimeExceptions", function(object, enable, ...)
     standardGeneric("enableRuntimeExceptions"))
 
+
+
+#' getRateCounter
+#'
 #' Get the rate counter
 #'
-#' How many time the rate has changed with a step
+#' How many times the rate has changed with a step
 #'
-#' @rdname Verlet-class
+#' @param object a class object
+#' @param ... additional parameters
+#'
+#' @rdname getRateCounter-method
 #' @export
 #' @example ./inst/examples/ComparisonRK45App.R
 setGeneric("getRateCounter", function(object, ...)
     standardGeneric("getRateCounter"))
 
 
+#' getTime
+#'
 #' Get the elapsed time
 #'
 #' @param object a class object
 #' @param ... additional parameters
+#'
 #' @rdname getTime-method
 #' @export
 #' @example ./inst/examples/LogisticApp.R
@@ -271,23 +294,27 @@ setGeneric("getRateCounter", function(object, ...)
 setGeneric("getTime", function(object, ...) standardGeneric("getTime"))
 
 
-
+#' getEnergy
+#'
 #' Get the calculated energy level
 #'
 #' @param object a class object
 #' @param ... additional parameters
+#'
 #' @rdname getEnergy-method
 #' @export
 #' @example ./inst/examples/KeplerEnergy.R
 setGeneric("getEnergy", function(object, ...) standardGeneric("getEnergy"))
 
 
-
+#' getExactSolution
+#'
 #' Compare analytical and calculated solutions
 #'
 #' @param object a class object
 #' @param ... additional parameters
 #' @param t time ath what we are performing the evaluation
+#'
 #' @rdname getExactSolution-method
 #' @export
 #' @example ./inst/examples/ComparisonRK45App.R

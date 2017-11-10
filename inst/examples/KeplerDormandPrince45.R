@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  base class: KeplerVerlet.R
 
-setClass("Kepler", slots = c(
+setClass("KeplerDormandPrince45", slots = c(
     GM = "numeric",
     odeSolver = "DormandPrince45",
     counter = "numeric"
@@ -8,7 +8,7 @@ setClass("Kepler", slots = c(
     contains = c("ODE")
 )
 
-setMethod("initialize", "Kepler", function(.Object, ...) {
+setMethod("initialize", "KeplerDormandPrince45", function(.Object, ...) {
     .Object@GM <- 4 * pi * pi         # gravitation constant times combined mass
     .Object@state <- vector("numeric", 5)  # x, vx, y, vy, t
     .Object@odeSolver <- DormandPrince45(.Object)
@@ -16,17 +16,17 @@ setMethod("initialize", "Kepler", function(.Object, ...) {
     return(.Object)
 })
 
-setMethod("doStep", "Kepler", function(object, ...) {
+setMethod("doStep", "KeplerDormandPrince45", function(object, ...) {
     object@odeSolver <- step(object@odeSolver)
     object@state <- object@odeSolver@ode@state
     object
 })
 
-setMethod("getTime", "Kepler", function(object, ...) {
+setMethod("getTime", "KeplerDormandPrince45", function(object, ...) {
     return(object@state[5])
 })
 
-setMethod("getEnergy", "Kepler", function(object, ...) {
+setMethod("getEnergy", "KeplerDormandPrince45", function(object, ...) {
     ke <- 0.5 * (object@state[2] * object@state[2] +
                      object@state[4] * object@state[4])
     pe <- -object@GM / sqrt(object@state[1] * object@state[1] +
@@ -34,14 +34,23 @@ setMethod("getEnergy", "Kepler", function(object, ...) {
     return(pe+ke)
 })
 
-setMethod("init", "Kepler", function(object, initState, ...) {
+setMethod("init", "KeplerDormandPrince45", function(object, initState, ...) {
     object@state <- initState
+    # call init in AbstractODESolver
     object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
     object@counter <- 0
     object
 })
 
-setMethod("getRate", "Kepler", function(object, state, ...) {
+setReplaceMethod("init", "KeplerDormandPrince45", function(object, ..., value) {
+    object@state <- value
+    # call init in AbstractODESolver
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+    object@counter <- 0
+    object
+})
+
+setMethod("getRate", "KeplerDormandPrince45", function(object, state, ...) {
     # Computes the rate using the given state.
     r2 <- state[1] * state[1] + state[3] * state[3]  # distance squared
     r3 <- r2 * sqrt(r2)   # distance cubed
@@ -53,16 +62,20 @@ setMethod("getRate", "Kepler", function(object, state, ...) {
 
     object@counter <- object@counter + 1
     object@rate
-
 })
 
-setMethod("getState", "Kepler", function(object, ...) {
+setMethod("getState", "KeplerDormandPrince45", function(object, ...) {
     # Gets the state variables.
     return(object@state)
 })
 
+setReplaceMethod("setSolver", "KeplerDormandPrince45", function(object, value) {
+    object@odeSolver <- value
+    object
+})
+
 # constructor
-Kepler <- function() {
-    kepler <- new("Kepler")
+KeplerDormandPrince45 <- function() {
+    kepler <- new("KeplerDormandPrince45")
     return(kepler)
 }

@@ -44,13 +44,17 @@ setMethod("getEnergy", "Kepler", function(object, ...) {
 setMethod("init", "Kepler", function(object, initState, ...) {
     object@state <- initState
     object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
-
-    # object@rate  <- object@odeSolver@ode@rate
-    # object@state <- object@odeSolver@ode@state
-
     object@counter <- 0
     object
 })
+
+setReplaceMethod("init", "Kepler", function(object, ..., value) {
+    object@state <- value
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+    object@counter <- 0
+    object
+})
+
 
 setMethod("getRate", "Kepler", function(object, state, ...) {
     # Computes the rate using the given state.

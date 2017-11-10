@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## The FallingParticleODE class using the EUler ODE solver
+## The FallingParticleODE class using the Euler ODE solver
 Because this is free fall of a particle in one-dimension, for vertical motion, we use Newton's second law:
 
 $$
@@ -48,8 +48,12 @@ r_2 = -g  \\
 r_3 = 1
 $$
 
+## Build the FallingParticleODE class
+We don't indicate the ODE solver at this time. That is done in the application in the next section.
 
-```{r eval=FALSE}
+```{r, message=FALSE, results='hold'}
+library(rODE)
+
 # This code can also be found in the `examples` folder under this name:
 # FallingParticleODE.R
 #
@@ -62,7 +66,6 @@ setClass("FallingParticleODE", slots = c(
     ),
     contains = c("ODE")
     )
-
 
 setMethod("initialize", "FallingParticleODE", function(.Object, ...) {
     .Object@state <- vector("numeric", 3)
@@ -92,7 +95,11 @@ FallingParticleODE <- function(y, v) {
     .FallingParticleODE
 }
 
+```
 
+## Run the application FallingParticleODEApp
+
+```{r}
 # This code can also be found in the `examples` folder under this name:
 # 
 # FallingParticleODEApp.R
@@ -140,29 +147,3 @@ FallingParticleODEApp()
 ```
 
 
-
-
-## Plots
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-# ggplot(DT, aes(x = state3, y = state1)) + geom_line(col = "blue")
-# ggplot(DT, aes(x = state3, y = state2)) + geom_line(col = "red")
-```
-
-
-## Data
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-# knitr::kable(head(DT, 10))
-```
-
-
-
-
-## The FallingParticleODE application
-The complete R script can be found in the examples folder of this package.
-At the bottom of the document

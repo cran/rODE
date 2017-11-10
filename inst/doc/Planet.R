@@ -1,4 +1,6 @@
-## ------------------------------------------------------------------------
+## ----message=FALSE, results='hold'---------------------------------------
+library(rODE)
+
 # This code can also be found in the `examples` folder under this name:
 # 
 # Planet.R
@@ -62,6 +64,8 @@ Planet <- function() {
 
 
 
+
+## ------------------------------------------------------------------------
 # #################
 # This code can also be found in the `examples` folder under this name:
 # PlanetApp.R
@@ -94,11 +98,6 @@ PlanetApp <- function(verbose = FALSE) {
 
 }
 
-
-
 PlanetApp()
-
-
-## ------------------------------------------------------------------------
 PlanetApp(verbose = TRUE)
 

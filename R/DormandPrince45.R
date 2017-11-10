@@ -1,32 +1,40 @@
-# DormandPrince45.R
-
-#' DormandPrince45 class
+#' DormandPrince45 ODE solver class
 #'
 #' @param object a class object
+#' @param ode ODE object
 #' @param enable a logical flag
+#' @param stepSize size of the step
+#' @param tol tolerance
+#' @param value step size to set
 #' @param ... additional parameters
 #'
 #' @rdname DormandPrince45-class
 #'
 #' @include ODEAdaptiveSolver.R ODE.R
 #' @example ./inst/examples/KeplerDormandPrince45.R
-setClass("DormandPrince45", slots = c(
-    error_code       = "numeric",
-    a                = "matrix",
-    b5               = "numeric",
-    er               = "numeric",
-    numStages        = "numeric",
-    stepSize         = "numeric",
-    numEqn           = "numeric",
-    temp_state       = "numeric",
-    k                = "matrix",
-    truncErr         = "numeric",
-    ode              = "ODE",
-    tol              = "numeric",
-    enableExceptions = "logical"
-    ),
-    contains = c("ODEAdaptiveSolver")
-    )
+.DormandPrince45 <- setClass("DormandPrince45", slots = c(
+                    error_code       = "numeric",
+                    a                = "matrix",
+                    b5               = "numeric",
+                    er               = "numeric",
+                    numStages        = "numeric",
+                    stepSize         = "numeric",
+                    numEqn           = "numeric",
+                    temp_state       = "numeric",
+                    k                = "matrix",
+                    truncErr         = "numeric",
+                    ode              = "ODE",
+                    tol              = "numeric",
+                    enableExceptions = "logical"
+                    ),
+                    contains = c("ODEAdaptiveSolver")
+                    )
+
+#' DormandPrince45 generic
+#'
+#' @rdname DormandPrince45-class
+#' @export
+setGeneric("DormandPrince45", function(ode, ...) standardGeneric("DormandPrince45"))
 
 
 setMethod("initialize", "DormandPrince45", function(.Object, ode, ...) {
@@ -50,7 +58,7 @@ setMethod("initialize", "DormandPrince45", function(.Object, ode, ...) {
 })
 
 
-#' @rdname init-method
+#' @rdname DormandPrince45-class
 setMethod("init", "DormandPrince45", function(object, stepSize, ...) {
     # inititalize the solver
     object@stepSize <- stepSize
@@ -68,8 +76,27 @@ setMethod("init", "DormandPrince45", function(object, stepSize, ...) {
     object
 })
 
+#' @rdname DormandPrince45-class
+setReplaceMethod("init", "DormandPrince45", function(object,  ..., value) {
+    stepSize <- value
+    # inititalize the solver
+    object@stepSize <- stepSize
+    state <- getState(object@ode)
+    if (is.null(state)) {
+        stop("state vector not defined")
+        return(object)      # state vector not defined.
+    }
+    if (object@numEqn != length(state)) {
+        object@numEqn <- length(state)
+        object@temp_state <- vector("numeric", object@numEqn)
+        object@k <- matrix(data = 0, nrow = object@numStages, ncol =  object@numEqn)
+    }
+    object@ode@state <- state
+    object
+})
 
-#' @rdname step-method
+
+#' @rdname DormandPrince45-class
 setMethod("step", "DormandPrince45", function(object, ...) {
     object@error_code <- object@NO_ERROR
     iterations        <- 10
@@ -146,25 +173,27 @@ setMethod("step", "DormandPrince45", function(object, ...) {
 
 
 #' @rdname DormandPrince45-class
+#' @aliases enableRuntimeExceptions,enableRuntimeExceptions-method
 setMethod("enableRuntimeExceptions", "DormandPrince45", function(object, enable) {
     object@enableExceptions <- enable
 })
 
 
-#' @rdname setStepSize-method
+#' @rdname DormandPrince45-class
 setMethod("setStepSize", "DormandPrince45", function(object, stepSize, ...) {
     object@stepSize <- stepSize
     object
 })
 
 
-#' @rdname getStepSize-method
+#' @rdname DormandPrince45-class
 setMethod("getStepSize", "DormandPrince45", function(object, ...) {
     return(object@stepSize)
 })
 
 
-#' @rdname setTolerance-method
+#' @rdname DormandPrince45-class
+#' @aliases setTolerance,setTolerance-method
 #' @example ./inst/examples/ComparisonRK45ODEApp.R
 #' @family adaptive solver methods
 setMethod("setTolerance", "DormandPrince45", function(object, tol) {
@@ -180,14 +209,35 @@ setMethod("setTolerance", "DormandPrince45", function(object, tol) {
     return(object)
 })
 
-#' @rdname getTolerance-method
+
+#' @rdname DormandPrince45-class
+#' @aliases setTolerance,setTolerance-method
+# #' @example ./inst/examples/ComparisonRK45ODEApp.R
+#' @family adaptive solver methods
+setReplaceMethod("setTolerance", "DormandPrince45", function(object, ..., value) {
+    tol <- value
+    object@tol <- abs(tol)
+    if (object@tol < 1.0E-12) {
+        err_msg = "Error: Dormand-Prince ODE solver tolerance cannot be smaller than 1.0e-12." # $NON-NLS-1$
+        if (object@enableExceptions) {
+            stop(err_msg)
+        }
+        cat(err_msg, "\n")
+        object@tol <- 1.0e-12
+    }
+    return(object)
+})
+
+
+#' @rdname DormandPrince45-class
+#' @aliases getTolerance,getTolerance-method
 #' @family adaptive solver methods
 setMethod("getTolerance", "DormandPrince45", function(object) {
     return(object@tol)
 })
 
-
-#' @rdname getErrorCode-method
+#' @rdname DormandPrince45-class
+#' @aliases getErrorCode,getErrorCode-method
 #' @family adaptive solver methods
 setMethod("getErrorCode", "DormandPrince45", function(object) {
     return(object@error_code)
@@ -195,14 +245,16 @@ setMethod("getErrorCode", "DormandPrince45", function(object) {
 
 
 
-#' DormandPrince45 constructor
+
+
+#' DormandPrince45 constructor ODE
 #'
-#' @param .ode an ODE object
+#' @rdname DormandPrince45-class
 #' @importFrom methods new
 #' @export
-#' @example ./inst/examples/KeplerDormandPrince45.R
-DormandPrince45 <- function(.ode) {
-    dormandPrince45 <- new("DormandPrince45", .ode)
-    dormandPrince45 <- init(dormandPrince45, dormandPrince45@stepSize)
+setMethod("DormandPrince45", signature(ode = "ODE"), function(ode, ...) {
+    # constructor for DormandPrince45 ODE solver
+    dormandPrince45 <- .DormandPrince45(ode = ode)
+    dormandPrince45 <- init(dormandPrince45, dormandPrince45@stepSize)                         # diff 5
     return(dormandPrince45)
-}
+})

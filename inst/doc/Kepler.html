@@ -12,9 +12,9 @@
 
 <meta name="author" content="Alfonso R. Reyes" />
 
-<meta name="date" content="2017-07-12" />
+<meta name="date" content="2017-11-09" />
 
-<title>Kepler. Interaction between two planets.</title>
+<title>Kepler. Interaction between two planets</title>
 
 
 
@@ -68,19 +68,20 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">Kepler. Interaction between two planets.</h1>
+<h1 class="title toc-ignore">Kepler. Interaction between two planets</h1>
 <h4 class="author"><em>Alfonso R. Reyes</em></h4>
-<h4 class="date"><em>2017-07-12</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
 
 
 
 <div id="the-kepler-class" class="section level2">
 <h2>The Kepler class</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rODE)
+
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co">#</span>
 <span class="co"># Kepler.R</span>
 <span class="co">#</span>
-
 
 <span class="kw">setClass</span>(<span class="st">&quot;Kepler&quot;</span>, <span class="dt">slots =</span> <span class="kw">c</span>(
     <span class="dt">GM =</span> <span class="st">&quot;numeric&quot;</span>
@@ -88,45 +89,51 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
 )
 
-<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Kepler&quot;</span>, function(.Object, ...) {
-    .Object@GM &lt;-<span class="st"> </span><span class="fl">1.0</span>                 <span class="co"># gravitation constant times combined mass</span>
-    .Object@state &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">5</span>)  <span class="co"># x, vx, y, vy, t</span>
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Kepler&quot;</span>, <span class="cf">function</span>(.Object, ...) {
+    .Object<span class="op">@</span>GM &lt;-<span class="st"> </span><span class="fl">1.0</span>                 <span class="co"># gravitation constant times combined mass</span>
+    .Object<span class="op">@</span>state &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">5</span>)  <span class="co"># x, vx, y, vy, t</span>
     <span class="kw">return</span>(.Object)
-})</code></pre></div>
-<pre><code>## [1] &quot;initialize&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Kepler&quot;</span>, function(object, ...) {
+})
+
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Kepler&quot;</span>, <span class="cf">function</span>(object, ...) {
     <span class="co"># Gets the state variables.</span>
-    <span class="kw">return</span>(object@state)
-})</code></pre></div>
-<pre><code>## [1] &quot;getState&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Kepler&quot;</span>, function(object, state, ...) {
+    <span class="kw">return</span>(object<span class="op">@</span>state)
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Kepler&quot;</span>, <span class="cf">function</span>(object, state, ...) {
     <span class="co"># Computes the rate using the given state.</span>
-    r2 &lt;-<span class="st"> </span>state[<span class="dv">1</span>] *<span class="st"> </span>state[<span class="dv">1</span>] +<span class="st"> </span>state[<span class="dv">3</span>] *<span class="st"> </span>state[<span class="dv">3</span>]  <span class="co"># distance squared</span>
-    r3 &lt;-<span class="st"> </span>r2 *<span class="st"> </span><span class="kw">sqrt</span>(r2)   <span class="co"># distance cubed</span>
-    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]
-    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>(-<span class="st"> </span>object@GM *<span class="st"> </span>state[<span class="dv">1</span>]) /<span class="st"> </span>r3
-    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span>state[<span class="dv">4</span>]
-    object@rate[<span class="dv">4</span>] &lt;-<span class="st"> </span>(-<span class="st"> </span>object@GM *<span class="st"> </span>state[<span class="dv">3</span>]) /<span class="st"> </span>r3
-    object@rate[<span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">1</span>   <span class="co"># time derivative</span>
+    r2 &lt;-<span class="st"> </span>state[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>state[<span class="dv">3</span>] <span class="op">*</span><span class="st"> </span>state[<span class="dv">3</span>]  <span class="co"># distance squared</span>
+    r3 &lt;-<span class="st"> </span>r2 <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(r2)   <span class="co"># distance cubed</span>
+    object<span class="op">@</span>rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]
+    object<span class="op">@</span>rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>(<span class="op">-</span><span class="st"> </span>object<span class="op">@</span>GM <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>]) <span class="op">/</span><span class="st"> </span>r3
+    object<span class="op">@</span>rate[<span class="dv">3</span>] &lt;-<span class="st"> </span>state[<span class="dv">4</span>]
+    object<span class="op">@</span>rate[<span class="dv">4</span>] &lt;-<span class="st"> </span>(<span class="op">-</span><span class="st"> </span>object<span class="op">@</span>GM <span class="op">*</span><span class="st"> </span>state[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>r3
+    object<span class="op">@</span>rate[<span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">1</span>   <span class="co"># time derivative</span>
 
-    object@rate
-})</code></pre></div>
-<pre><code>## [1] &quot;getRate&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># constructor</span>
-Kepler &lt;-<span class="st"> </span>function(r, v) {
+    object<span class="op">@</span>rate
+})
+
+<span class="co"># constructor</span>
+Kepler &lt;-<span class="st"> </span><span class="cf">function</span>(r, v) {
     kepler &lt;-<span class="st"> </span><span class="kw">new</span>(<span class="st">&quot;Kepler&quot;</span>)
-    kepler@state[<span class="dv">1</span>] =<span class="st"> </span>r[<span class="dv">1</span>]
-    kepler@state[<span class="dv">2</span>] =<span class="st"> </span>v[<span class="dv">1</span>]
-    kepler@state[<span class="dv">3</span>] =<span class="st"> </span>r[<span class="dv">2</span>]
-    kepler@state[<span class="dv">4</span>] =<span class="st"> </span>v[<span class="dv">2</span>]
-    kepler@state[<span class="dv">5</span>] =<span class="st"> </span><span class="dv">0</span>
+    kepler<span class="op">@</span>state[<span class="dv">1</span>] =<span class="st"> </span>r[<span class="dv">1</span>]
+    kepler<span class="op">@</span>state[<span class="dv">2</span>] =<span class="st"> </span>v[<span class="dv">1</span>]
+    kepler<span class="op">@</span>state[<span class="dv">3</span>] =<span class="st"> </span>r[<span class="dv">2</span>]
+    kepler<span class="op">@</span>state[<span class="dv">4</span>] =<span class="st"> </span>v[<span class="dv">2</span>]
+    kepler<span class="op">@</span>state[<span class="dv">5</span>] =<span class="st"> </span><span class="dv">0</span>
     <span class="kw">return</span>(kepler)
-}
-
-<span class="co"># This code can also be found in the `examples` folder under this name:</span>
+}</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;
+## [1] &quot;getState&quot;
+## [1] &quot;getRate&quot;</code></pre>
+</div>
+<div id="run-the-application-keplerapp" class="section level2">
+<h2>Run the application KeplerApp</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co"># KeplerApp.R</span>
 <span class="co">#</span>
-KeplerApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
+KeplerApp &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
     
     <span class="co"># set the orbit into a predefined state.</span>
     r &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">0</span>)
@@ -138,14 +145,14 @@ KeplerApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</spa
     
     <span class="co"># solver &lt;- step(solver)</span>
     
-    while (planet@state[<span class="dv">5</span>] &lt;=<span class="st"> </span><span class="dv">10</span>) {
+    <span class="cf">while</span> (planet<span class="op">@</span>state[<span class="dv">5</span>] <span class="op">&lt;=</span><span class="st"> </span><span class="dv">10</span>) {
         solver &lt;-<span class="st"> </span><span class="kw">step</span>(solver)
-        planet &lt;-<span class="st"> </span>solver@ode
-        if (verbose)
+        planet &lt;-<span class="st"> </span>solver<span class="op">@</span>ode
+        <span class="cf">if</span> (verbose)
             <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;state[1]=%10f, state[2]= %10f,  </span>
 <span class="st">                        state[3]=%10f, state[5]=%10f</span><span class="ch">\n</span><span class="st">&quot;</span>,
-                    planet@state[<span class="dv">1</span>],
-                    planet@state[<span class="dv">2</span>], planet@state[<span class="dv">3</span>], planet@state[<span class="dv">5</span>]))
+                    planet<span class="op">@</span>state[<span class="dv">1</span>],
+                    planet<span class="op">@</span>state[<span class="dv">2</span>], planet<span class="op">@</span>state[<span class="dv">3</span>], planet<span class="op">@</span>state[<span class="dv">5</span>]))
     }
     
 <span class="co"># at t=100, dt=0.1,  c(2.131958,     1.105316,   100.000000)</span>

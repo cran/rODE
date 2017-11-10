@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{showMethods2}
 \alias{showMethods2}
-\title{Get the methods in a class}
+\title{showMethods2}
 \usage{
 showMethods2(theClass)
 }
@@ -10,5 +10,5 @@ showMethods2(theClass)
 \item{theClass}{class to analyze}
 }
 \description{
-But only those specific to the class
+Get the methods in a class. But only those specific to the class
 }

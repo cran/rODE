@@ -12,7 +12,7 @@
 
 <meta name="author" content="Alfonso R. Reyes" />
 
-<meta name="date" content="2017-07-12" />
+<meta name="date" content="2017-11-09" />
 
 <title>Pendulum with Euler-Richardson ODE solver</title>
 
@@ -70,13 +70,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Pendulum with Euler-Richardson ODE solver</h1>
 <h4 class="author"><em>Alfonso R. Reyes</em></h4>
-<h4 class="date"><em>2017-07-12</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
 
 
 
-<div id="pendulum-with-euler-richardson-ode-solver" class="section level2">
-<h2>Pendulum with Euler-Richardson ODE solver</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<div id="define-the-ode-solver-pendulum-with-euler-richardson-ode-solver" class="section level2">
+<h2>Define the ODE Solver: Pendulum with Euler-Richardson ODE solver</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rODE)
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co">#</span>
 <span class="co"># Pendulum.R</span>
 <span class="co">#</span>
@@ -95,56 +96,65 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
     )
 
-<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(.Object) {
-    .Object@odeSolver &lt;-<span class="st"> </span><span class="kw">EulerRichardson</span>(.Object)
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, <span class="cf">function</span>(.Object) {
+    .Object<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">EulerRichardson</span>(.Object)
     <span class="kw">return</span>(.Object)
-})</code></pre></div>
-<pre><code>## [1] &quot;initialize&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;setStepSize&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Pendulum&quot;</span>), function(object, dt, ...) {
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;setStepSize&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Pendulum&quot;</span>), <span class="cf">function</span>(object, dt, ...) {
     <span class="co"># use explicit parameter declaration</span>
     <span class="co"># setStepSize generic may use two different step parameters: stepSize and dt</span>
-    object@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(object@odeSolver, dt)
+    object<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(object<span class="op">@</span>odeSolver, dt)
     object
-})</code></pre></div>
-<pre><code>## [1] &quot;setStepSize&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;step&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(object) {
-    object@odeSolver &lt;-<span class="st"> </span><span class="kw">step</span>(object@odeSolver)
-    object@rate  &lt;-<span class="st"> </span>object@odeSolver@ode@rate
-    object@state &lt;-<span class="st"> </span>object@odeSolver@ode@state
+})
+
+
+<span class="kw">setMethod</span>(<span class="st">&quot;step&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, <span class="cf">function</span>(object) {
+    object<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">step</span>(object<span class="op">@</span>odeSolver)
+    object<span class="op">@</span>rate  &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>rate
+    object<span class="op">@</span>state &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>state
     object
-})</code></pre></div>
-<pre><code>## [1] &quot;step&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;setState&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Pendulum&quot;</span>), function(object, theta, thetaDot, ...) {
-    object@state[<span class="dv">1</span>] &lt;-<span class="st"> </span>theta     <span class="co"># angle</span>
-    object@state[<span class="dv">2</span>] &lt;-<span class="st"> </span>thetaDot  <span class="co"># derivative of angle</span>
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;setState&quot;</span>, <span class="kw">signature</span>(<span class="st">&quot;Pendulum&quot;</span>), <span class="cf">function</span>(object, theta, thetaDot, ...) {
+    object<span class="op">@</span>state[<span class="dv">1</span>] &lt;-<span class="st"> </span>theta     <span class="co"># angle</span>
+    object<span class="op">@</span>state[<span class="dv">2</span>] &lt;-<span class="st"> </span>thetaDot  <span class="co"># derivative of angle</span>
     <span class="co">#                              state[3] is time</span>
-    object@odeSolver@ode@state &lt;-<span class="st"> </span>object@state
+    object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>state &lt;-<span class="st"> </span>object<span class="op">@</span>state
     object
-})</code></pre></div>
-<pre><code>## [1] &quot;setState&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(object) {
-    object@state
-})</code></pre></div>
-<pre><code>## [1] &quot;getState&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, function(object, state, ...) {
-    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]     <span class="co"># rate of change of angle</span>
-    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>-object@omega0Squared *<span class="st"> </span><span class="kw">sin</span>(state[<span class="dv">1</span>]) <span class="co"># rate of change dtheta</span>
-    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>            <span class="co"># rate of change of time, dt/dt</span>
+})
 
-    object@rate
-})</code></pre></div>
-<pre><code>## [1] &quot;getRate&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># constructor</span>
-Pendulum &lt;-<span class="st"> </span>function()  <span class="kw">new</span>(<span class="st">&quot;Pendulum&quot;</span>)
+<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, <span class="cf">function</span>(object) {
+    object<span class="op">@</span>state
+})
 
 
+<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Pendulum&quot;</span>, <span class="cf">function</span>(object, state, ...) {
+    object<span class="op">@</span>rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]     <span class="co"># rate of change of angle</span>
+    object<span class="op">@</span>rate[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="op">-</span>object<span class="op">@</span>omega0Squared <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(state[<span class="dv">1</span>]) <span class="co"># rate of change dtheta</span>
+    object<span class="op">@</span>rate[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">1</span>            <span class="co"># rate of change of time, dt/dt</span>
 
-<span class="co"># #############</span>
+    object<span class="op">@</span>rate
+})
+
+
+<span class="co"># constructor</span>
+Pendulum &lt;-<span class="st"> </span><span class="cf">function</span>()  <span class="kw">new</span>(<span class="st">&quot;Pendulum&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;
+## [1] &quot;setStepSize&quot;
+## [1] &quot;step&quot;
+## [1] &quot;setState&quot;
+## [1] &quot;getState&quot;
+## [1] &quot;getRate&quot;</code></pre>
+</div>
+<div id="run-the-application-pendulumapp" class="section level2">
+<h2>Run the application PendulumApp</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># #############</span>
 <span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co">#</span>
 <span class="co"># PendulumApp.R</span>
 <span class="co">#</span>
-PendulumApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
+PendulumApp &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
     
     <span class="kw">library</span>(ggplot2)
     
@@ -155,29 +165,29 @@ PendulumApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</s
     theta &lt;-<span class="st"> </span><span class="fl">0.2</span>
     thetaDot &lt;-<span class="st"> </span><span class="dv">0</span>
     
-    pendulum@state[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>      <span class="co"># set time to zero, t = 0</span>
+    pendulum<span class="op">@</span>state[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>      <span class="co"># set time to zero, t = 0</span>
     
     pendulum &lt;-<span class="st"> </span><span class="kw">setState</span>(pendulum, theta, thetaDot)
     pendulum &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(pendulum, <span class="dt">dt =</span> dt) <span class="co"># using stepSize in RK4</span>
     
-    pendulum@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(pendulum@odeSolver, dt) <span class="co"># set new step size</span>
+    pendulum<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(pendulum<span class="op">@</span>odeSolver, dt) <span class="co"># set new step size</span>
     
     rowvec &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>)
     i &lt;-<span class="st"> </span><span class="dv">1</span>
-    while (pendulum@state[<span class="dv">3</span>] &lt;=<span class="st"> </span><span class="dv">1000</span>)    {
-        rowvec[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">state1 =</span> pendulum@state[<span class="dv">1</span>], <span class="co"># angle</span>
-                            <span class="dt">state2 =</span> pendulum@state[<span class="dv">2</span>],  <span class="co"># derivative of the angle</span>
-                            <span class="dt">state3 =</span> pendulum@state[<span class="dv">3</span>])       <span class="co"># time</span>
-        if (verbose)
+    <span class="cf">while</span> (pendulum<span class="op">@</span>state[<span class="dv">3</span>] <span class="op">&lt;=</span><span class="st"> </span><span class="dv">1000</span>)    {
+        rowvec[[i]] &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">state1 =</span> pendulum<span class="op">@</span>state[<span class="dv">1</span>], <span class="co"># angle</span>
+                            <span class="dt">state2 =</span> pendulum<span class="op">@</span>state[<span class="dv">2</span>],  <span class="co"># derivative of the angle</span>
+                            <span class="dt">state3 =</span> pendulum<span class="op">@</span>state[<span class="dv">3</span>])       <span class="co"># time</span>
+        <span class="cf">if</span> (verbose)
             <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;state1=%12f state2=%12f state3=%12f </span><span class="ch">\n</span><span class="st">&quot;</span>, 
-                        pendulum@state[<span class="dv">1</span>], pendulum@state[<span class="dv">2</span>], pendulum@state[<span class="dv">3</span>]))
-        i &lt;-<span class="st"> </span>i +<span class="st"> </span><span class="dv">1</span>
+                        pendulum<span class="op">@</span>state[<span class="dv">1</span>], pendulum<span class="op">@</span>state[<span class="dv">2</span>], pendulum<span class="op">@</span>state[<span class="dv">3</span>]))
+        i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
         pendulum &lt;-<span class="st"> </span><span class="kw">step</span>(pendulum)
     }
-    DT.ER&lt;-<span class="st"> </span>data.table::<span class="kw">rbindlist</span>(rowvec)
+    DT.ER&lt;-<span class="st"> </span>data.table<span class="op">::</span><span class="kw">rbindlist</span>(rowvec)
     
-    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT.ER, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state1)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>))
-    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT.ER, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state2)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;red&quot;</span>))
+    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT.ER, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>))
+    <span class="kw">print</span>(<span class="kw">ggplot</span>(DT.ER, <span class="kw">aes</span>(<span class="dt">x =</span> state3, <span class="dt">y =</span> state2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">col =</span> <span class="st">&quot;red&quot;</span>))
     <span class="co"># save(DTRK4, file = &quot;./data/pendulumRK4_1e-3.rda&quot;)</span>
 }
 

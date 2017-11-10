@@ -3,12 +3,43 @@
 \docType{class}
 \name{ODESolver-class}
 \alias{ODESolver-class}
+\alias{.ODESolver}
+\alias{ODESolver}
+\alias{init,ODESolver-method}
+\alias{step,ODESolver-method}
+\alias{getODE,ODESolver-method}
+\alias{setStepSize,ODESolver-method}
+\alias{getStepSize,ODESolver-method}
 \title{ODESolver virtual class}
+\usage{
+ODESolver(object, stepSize, ...)
+
+\S4method{init}{ODESolver}(object, stepSize, ...)
+
+\S4method{step}{ODESolver}(object, ...)
+
+\S4method{getODE}{ODESolver}(object, ...)
+
+\S4method{setStepSize}{ODESolver}(object, stepSize, ...)
+
+\S4method{getStepSize}{ODESolver}(object, ...)
+}
 \arguments{
 \item{object}{a class object}
 
 \item{stepSize}{size of the step}
+
+\item{...}{additional parameters}
 }
 \description{
 A virtual class inherited by AbstractODESolver
+
+ODESolver constructor
+
+Set initial values and get ready to start the solver
+
+Set the size of the step
+}
+\seealso{
+Other ODESolver helpers: \code{\link{ODESolverFactory-class}}
 }

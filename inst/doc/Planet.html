@@ -12,9 +12,9 @@
 
 <meta name="author" content="Vignette Author" />
 
-<meta name="date" content="2017-07-12" />
+<meta name="date" content="2017-11-09" />
 
-<title>Planet orbiting. ODE solver: Euler</title>
+<title>Planet orbiting with Euler ODE solver</title>
 
 
 
@@ -68,15 +68,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">Planet orbiting. ODE solver: Euler</h1>
+<h1 class="title toc-ignore">Planet orbiting with Euler ODE solver</h1>
 <h4 class="author"><em>Vignette Author</em></h4>
-<h4 class="date"><em>2017-07-12</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
 
 
 
-<div id="planet-with-euler-ode-solver" class="section level2">
-<h2>Planet with EUler ODE solver</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This code can also be found in the `examples` folder under this name:</span>
+<div id="build-the-class-planet-with-the-euler-ode-solver" class="section level2">
+<h2>Build the class Planet with the Euler ODE solver</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rODE)
+
+<span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co"># </span>
 <span class="co"># Planet.R</span>
 <span class="co">#</span>
@@ -87,64 +89,69 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">contains =</span> <span class="kw">c</span>(<span class="st">&quot;ODE&quot;</span>)
 )
 
-<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Planet&quot;</span>, function(.Object, ...) {
-    .Object@GM &lt;-<span class="st"> </span><span class="dv">4</span> *<span class="st"> </span>pi *<span class="st"> </span>pi
-    .Object@state &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">5</span>)
-    .Object@odeSolver &lt;-<span class="st"> </span><span class="kw">Euler</span>(.Object)
+<span class="kw">setMethod</span>(<span class="st">&quot;initialize&quot;</span>, <span class="st">&quot;Planet&quot;</span>, <span class="cf">function</span>(.Object, ...) {
+    .Object<span class="op">@</span>GM &lt;-<span class="st"> </span><span class="dv">4</span> <span class="op">*</span><span class="st"> </span>pi <span class="op">*</span><span class="st"> </span>pi
+    .Object<span class="op">@</span>state &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="dv">5</span>)
+    .Object<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">Euler</span>(.Object)
     <span class="kw">return</span>(.Object)
-})</code></pre></div>
-<pre><code>## [1] &quot;initialize&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;doStep&quot;</span>, <span class="st">&quot;Planet&quot;</span>, function(object, ...) {
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;doStep&quot;</span>, <span class="st">&quot;Planet&quot;</span>, <span class="cf">function</span>(object, ...) {
     <span class="co"># Gets the state variables.</span>
-    object@odeSolver &lt;-<span class="st"> </span><span class="kw">step</span>(object@odeSolver)
-    object@state &lt;-<span class="st"> </span>object@odeSolver@ode@state
-    object@rate  &lt;-<span class="st"> </span>object@odeSolver@ode@rate
+    object<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">step</span>(object<span class="op">@</span>odeSolver)
+    object<span class="op">@</span>state &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>state
+    object<span class="op">@</span>rate  &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>rate
     <span class="kw">invisible</span>(object)
-})</code></pre></div>
-<pre><code>## [1] &quot;doStep&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;init&quot;</span>, <span class="st">&quot;Planet&quot;</span>, function(object, initState, ...) {
-    object@state &lt;-<span class="st"> </span>object@odeSolver@ode@state &lt;-<span class="st"> </span>initState
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;init&quot;</span>, <span class="st">&quot;Planet&quot;</span>, <span class="cf">function</span>(object, initState, ...) {
+    object<span class="op">@</span>state &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>state &lt;-<span class="st"> </span>initState
     <span class="co"># initialize providing the step size</span>
-    object@odeSolver &lt;-<span class="st"> </span><span class="kw">init</span>(object@odeSolver, <span class="kw">getStepSize</span>(object@odeSolver))
-    object@rate &lt;-<span class="st"> </span>object@odeSolver@ode@rate
-    object@state &lt;-<span class="st"> </span>object@odeSolver@ode@state
+    object<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">init</span>(object<span class="op">@</span>odeSolver, <span class="kw">getStepSize</span>(object<span class="op">@</span>odeSolver))
+    object<span class="op">@</span>rate &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>rate
+    object<span class="op">@</span>state &lt;-<span class="st"> </span>object<span class="op">@</span>odeSolver<span class="op">@</span>ode<span class="op">@</span>state
 
     object
 
-})</code></pre></div>
-<pre><code>## [1] &quot;init&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Planet&quot;</span>, function(object, state, ...) {
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getRate&quot;</span>, <span class="st">&quot;Planet&quot;</span>, <span class="cf">function</span>(object, state, ...) {
     <span class="co"># Gets the rate of change using the argument's state variables.</span>
-    r2 &lt;-<span class="st"> </span>state[<span class="dv">1</span>] *<span class="st"> </span>state[<span class="dv">1</span>] +<span class="st"> </span>state[<span class="dv">3</span>] *<span class="st"> </span>state[<span class="dv">3</span>]
-    r3 &lt;-<span class="st"> </span>r2 *<span class="st"> </span><span class="kw">sqrt</span>(r2)
-    object@rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]
-    object@rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>(-<span class="st"> </span>object@GM *<span class="st"> </span>state[<span class="dv">1</span>]) /<span class="st"> </span>r3
-    object@rate[<span class="dv">3</span>] &lt;-<span class="st"> </span>state[<span class="dv">4</span>]
-    object@rate[<span class="dv">4</span>] &lt;-<span class="st"> </span>(-<span class="st"> </span>object@GM *<span class="st"> </span>state[<span class="dv">3</span>]) /<span class="st"> </span>r3
-    object@rate[<span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">1</span>
+    r2 &lt;-<span class="st"> </span>state[<span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>state[<span class="dv">3</span>] <span class="op">*</span><span class="st"> </span>state[<span class="dv">3</span>]
+    r3 &lt;-<span class="st"> </span>r2 <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(r2)
+    object<span class="op">@</span>rate[<span class="dv">1</span>] &lt;-<span class="st"> </span>state[<span class="dv">2</span>]
+    object<span class="op">@</span>rate[<span class="dv">2</span>] &lt;-<span class="st"> </span>(<span class="op">-</span><span class="st"> </span>object<span class="op">@</span>GM <span class="op">*</span><span class="st"> </span>state[<span class="dv">1</span>]) <span class="op">/</span><span class="st"> </span>r3
+    object<span class="op">@</span>rate[<span class="dv">3</span>] &lt;-<span class="st"> </span>state[<span class="dv">4</span>]
+    object<span class="op">@</span>rate[<span class="dv">4</span>] &lt;-<span class="st"> </span>(<span class="op">-</span><span class="st"> </span>object<span class="op">@</span>GM <span class="op">*</span><span class="st"> </span>state[<span class="dv">3</span>]) <span class="op">/</span><span class="st"> </span>r3
+    object<span class="op">@</span>rate[<span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">1</span>
 
-    object@rate
+    object<span class="op">@</span>rate
 
-})</code></pre></div>
-<pre><code>## [1] &quot;getRate&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Planet&quot;</span>, function(object, ...) {
+})
+
+<span class="kw">setMethod</span>(<span class="st">&quot;getState&quot;</span>, <span class="st">&quot;Planet&quot;</span>, <span class="cf">function</span>(object, ...) {
     <span class="co"># Gets the state variables.</span>
-    <span class="kw">invisible</span>(object@state)
-})</code></pre></div>
-<pre><code>## [1] &quot;getState&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># constructor</span>
-Planet &lt;-<span class="st"> </span>function() {
+    <span class="kw">invisible</span>(object<span class="op">@</span>state)
+})
+
+<span class="co"># constructor</span>
+Planet &lt;-<span class="st"> </span><span class="cf">function</span>() {
     <span class="kw">new</span>(<span class="st">&quot;Planet&quot;</span>)
-}
-
-
-
-<span class="co"># #################</span>
+}</code></pre></div>
+<pre><code>## [1] &quot;initialize&quot;
+## [1] &quot;doStep&quot;
+## [1] &quot;init&quot;
+## [1] &quot;getRate&quot;
+## [1] &quot;getState&quot;</code></pre>
+</div>
+<div id="run-the-application-planetapp" class="section level2">
+<h2>Run the application PlanetApp</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># #################</span>
 <span class="co"># This code can also be found in the `examples` folder under this name:</span>
 <span class="co"># PlanetApp.R</span>
 <span class="co">#</span>
 <span class="co">#</span>
-PlanetApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
+PlanetApp &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">verbose =</span> <span class="ot">FALSE</span>) {
         
     <span class="co"># x =  1, AU or Astronomical Units. </span>
     <span class="co"># Length of semimajor axis or the orbit of the Earth around the Sun.</span>
@@ -155,26 +162,24 @@ PlanetApp &lt;-<span class="st"> </span>function(<span class="dt">verbose =</spa
     
     planet &lt;-<span class="st"> </span><span class="kw">Planet</span>()
     
-    planet@odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(planet@odeSolver, dt)
+    planet<span class="op">@</span>odeSolver &lt;-<span class="st"> </span><span class="kw">setStepSize</span>(planet<span class="op">@</span>odeSolver, dt)
     planet &lt;-<span class="st"> </span><span class="kw">init</span>(planet, <span class="dt">initState =</span> state)
     
     <span class="co"># run infinite loop. stop with ESCAPE.</span>
-    while (planet@state[<span class="dv">5</span>] &lt;=<span class="st"> </span><span class="dv">30</span>) {  <span class="co"># Earth orbit is 365 days around the sun</span>
-        for (i in <span class="dv">1</span>:<span class="dv">5</span>) {               <span class="co"># advances time</span>
+    <span class="cf">while</span> (planet<span class="op">@</span>state[<span class="dv">5</span>] <span class="op">&lt;=</span><span class="st"> </span><span class="dv">30</span>) {  <span class="co"># Earth orbit is 365 days around the sun</span>
+        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>) {               <span class="co"># advances time</span>
             planet &lt;-<span class="st"> </span><span class="kw">doStep</span>(planet)
         }
-        if (verbose) 
+        <span class="cf">if</span> (verbose) 
             <span class="kw">cat</span>(<span class="kw">sprintf</span>(<span class="st">&quot;%12f %12f %12f %12f %12f </span><span class="ch">\n</span><span class="st">&quot;</span>,
-                    planet@state[<span class="dv">1</span>], planet@state[<span class="dv">2</span>], planet@state[<span class="dv">3</span>],
-                    planet@state[<span class="dv">4</span>], planet@state[<span class="dv">5</span>]))
+                    planet<span class="op">@</span>state[<span class="dv">1</span>], planet<span class="op">@</span>state[<span class="dv">2</span>], planet<span class="op">@</span>state[<span class="dv">3</span>],
+                    planet<span class="op">@</span>state[<span class="dv">4</span>], planet<span class="op">@</span>state[<span class="dv">5</span>]))
     }
 
 }
 
-
-
-<span class="kw">PlanetApp</span>()</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">PlanetApp</span>(<span class="dt">verbose =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<span class="kw">PlanetApp</span>()
+<span class="kw">PlanetApp</span>(<span class="dt">verbose =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code>##     0.960830    -1.935516     0.311551     6.036920     0.050000 
 ##     0.828291    -3.664744     0.599282     5.226614     0.100000 
 ##     0.616106    -5.024789     0.836811     3.960022     0.150000 

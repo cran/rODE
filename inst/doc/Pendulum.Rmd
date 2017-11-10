@@ -9,9 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Pendulum with Euler-Richardson ODE solver
+## Define the ODE Solver: Pendulum with Euler-Richardson ODE solver
 
-```{r}
+
+```{r message=FALSE, results='hold'}
+library(rODE)
 # This code can also be found in the `examples` folder under this name:
 #
 # Pendulum.R
@@ -76,8 +78,12 @@ setMethod("getRate", "Pendulum", function(object, state, ...) {
 # constructor
 Pendulum <- function()  new("Pendulum")
 
+```
 
 
+## Run the application PendulumApp
+
+```{r}
 # #############
 # This code can also be found in the `examples` folder under this name:
 #

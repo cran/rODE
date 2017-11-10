@@ -8,10 +8,10 @@ test_that("ODEAdaptiveSolver instance is right", {
 
     # print(showMethods2("ODEAdaptiveSolver"))
     expect_true(all(showMethods2("ODEAdaptiveSolver") %in%
-                 c("getErrorCode", "getTolerance", "setTolerance", "initialize")))
+                 c("getErrorCode", "getTolerance", "setTolerance", "initialize", "setTolerance<-")))
 
     expect_true(all(showMethods2("ODEAdaptiveSolver") %in%
-                    c("getErrorCode", "getTolerance", "initialize", "setTolerance")))
+                    c("getErrorCode", "getTolerance", "initialize", "setTolerance", "setTolerance<-")))
 
 
     expect_equal(c(solver@NO_ERROR,

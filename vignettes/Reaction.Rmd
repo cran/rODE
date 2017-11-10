@@ -4,14 +4,16 @@ author: "Vignette Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Chemical Reaction}
+  %\VignetteIndexEntry{ChemicalReaction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-## Reaction with RK4 solver
+## Build the Reaction class with a RK4 solver
 
-```{r}
+
+```{r message=FALSE, results='hold'}
+library(rODE)
 # This code can also be found in the `examples` folder under this name:
 # Reaction.R
 
@@ -23,7 +25,6 @@ vignette: >
 # * Converted to R by: Alfonso R. Reyes
 #
 # */
-
 
 setClass("Reaction", slots = c(
     k1 = "numeric",
@@ -43,7 +44,6 @@ setClass("Reaction", slots = c(
     contains = c("ODE")
     )
 
-
 setMethod("getState", "Reaction", function(object) {
     object@state
 })
@@ -55,12 +55,8 @@ setMethod("getRate", "Reaction", function(object, state, ...) {
         object@k3 * xxy - object@k4 * state[1]                          # X rate
     object@rate[2] <- object@k2 * object@B * state[1] - object@k3 * xxy # Y rate
     object@rate[3] <- 1                         # rate of change of time, dt/dt
-
-    object@rate                                                # time derivative
+    object@rate                                 # time derivative
 })
-
-
-
 
 # constructor
 Reaction <- function(initialConditions) {
@@ -68,33 +64,40 @@ Reaction <- function(initialConditions) {
     .Reaction@state <- initialConditions
     .Reaction
 }
+```
 
+## Run the application ReactionApp
 
-# This code can also be found in the `examples` folder under this name:
-# ReactionApp.R
-#
+```{r}
+# +++++++++++++++++++++++++++++++++++++++++++++++++++ application: ReactionApp.R
 # ReactionApp solves an autocatalytic oscillating chemical
 # reaction (Brusselator model) using
-# a fouth-order Runge-Kutta algorithm.
-#
-#
+# a fourth-order Runge-Kutta algorithm.
+
 ReactionApp <- function(verbose = FALSE) {
-    
     X <- 1; Y <- 5;
     dt <- 0.1
-    
     reaction <- Reaction(c(X, Y, 0))
-    solver <- RK4(reaction)
+    solver  <- RK4(reaction)
     
-    while (solver@ode@state[3] < 100) {
-        if (verbose)
-            cat(sprintf("%12f %12f %12f \n", solver@ode@state[1],
-                    solver@ode@state[2], solver@ode@state[3]))
-        solver <- step(solver)
+    rowvec  <- vector("list")
+    i <- 1
+    while (getState(reaction)[3] < 100) {             # stop at t = 100
+        rowvec[[i]] <- list(t = getState(reaction)[3],
+                            X = getState(reaction)[1],
+                            Y = getState(reaction)[2])
+        solver   <- step(solver)
+        reaction <- getODE(solver)
+        i <-  i + 1
     }
-    # at t=100, dt=0.1,  c(2.131958,     1.105316,   100.000000)
+    DT <- data.table::rbindlist(rowvec)
+    return(DT)
 }
 
-ReactionApp()
+
+solution <- ReactionApp()
+plot(solution$t, solution$X)
+plot(solution$t, solution$Y)
+plot(solution$X, solution$Y)
 ```
 

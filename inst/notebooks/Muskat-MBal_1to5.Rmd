@@ -1,0 +1,292 @@
+---
+title: "Muskat Material Balance"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Muskat Material Balance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+For the Muskat's Material Balance equation:
+
+$$\newcommand{\numD}{{\dfrac {S_o}{B_o B_g} \dfrac {dR_s}{dP} +  
+\dfrac {S_o}{B_o} \dfrac {k_g}{k_o} \dfrac {\mu_o}{\mu_g} \dfrac {dB_o}{dP} + 
+(1 - S_o - S_w) \dfrac {1}{B_g} \dfrac {dB_g}{dP} }}$$
+
+
+$$\dfrac {dS_o}{dP} = \dfrac {\numD} {1 + \dfrac {k_g}{k_o} \dfrac {\mu_o}{\mu_g} }$$
+
+All the terms on the right side are function of pressure ($P$) and saturation ($S$), the equation could be reduced to:
+
+$$ \dfrac{dS}{dP} = f(P, S)$$
+
+A first-order ordinary diferential equation (*ODE*).
+
+With analytical solution:
+
+$$y(x) = C_1e^x-2x-2$$
+
+## Plot a range of values for a given step size
+
+Given the ODE:
+$$ \dfrac{dS}{dP} = (2P +  S)$$
+
+Find the first saturation values if the initial conditions are $P_o$ = 0, and $S_o$ = 1.
+
+The analytical solution for the the differential equation given the initial conditions is:
+$$S(P) = 3e^P-2P-2$$
+
+
+## Build the ODE object
+Since we know the analytical solution, we will add a method `getExactSolution` to return the exact values at any given P.
+
+```{r message=FALSE, results="hold"}
+# the ODE object
+
+library(rODE)
+library(ggplot2)
+
+setClass("MuskatODE", slots = c(
+    stack = "environment"                # environment object inside the class
+    ),
+    contains = c("ODE")
+    )
+
+setMethod("initialize", "MuskatODE", function(.Object, ...) {
+    .Object@stack$n <-  0               
+    return(.Object)
+})
+
+setMethod("getExactSolution", "MuskatODE", function(object, t, ...) {
+    # analytical solution
+    return(3 * exp(t) - 2 *t - 2)       # constant C1 = 3 
+})
+
+setMethod("getState", "MuskatODE", function(object, ...) {
+    object@state
+})
+
+setMethod("getRate", "MuskatODE", function(object, state, ...) {
+    object@rate[1] <- state[1] + 2 * state[2]         # 2P + S
+    object@rate[2] <- 1                               # dP/dP
+    object@stack$n <- object@stack$n + 1              # add 1 to the rate count
+    object@rate
+})
+
+# constructor
+MuskatODE <- function(P, S) {
+    .MuskatEuler <- new("MuskatODE")
+    .MuskatEuler@state[1] = S        # S
+    .MuskatEuler@state[2] = P        # P = t
+    return(.MuskatEuler)
+}
+```
+
+## Implementing the Euler solver
+
+```{r}
+MuskatEulerApp <- function(stepSize) {
+    ode <- MuskatODE(0, 1)               # initial state  S(0) = 1
+    ode_solver <- Euler(ode)
+    ode_solver <- setStepSize(ode_solver, stepSize)
+    rowVector <- vector("list")
+    pres <-  0
+    i    <-  1
+    while (pres < 5) {
+        state <- getState(ode_solver@ode)
+        pres <- state[2]
+        error <- getExactSolution(ode_solver@ode, pres) - state[1]
+        rowVector[[i]] <- list(step_size = stepSize, 
+                               P = pres, 
+                               S = state[1], 
+                               exact = getExactSolution(ode_solver@ode, pres),
+                               error = error, 
+                               rel_err = error / getExactSolution(ode_solver@ode, pres),
+                               steps = ode_solver@ode@stack$n
+                               )
+        ode_solver <- step(ode_solver)
+        i <- i + 1
+    }
+    data.table::rbindlist(rowVector)
+}
+```
+
+### Summary table for Euler
+
+```{r}
+# get a summary table for different step sizes
+get_table <- function(stepSize) {
+    dt <- MuskatEulerApp(stepSize)
+    dt[round(P, 1) %in% c(1.0, 2.0, 3.0, 4.0, 5.0)]   # round at 1 decimal
+}
+# vector with some step sizes
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, get_table)    # create a data table 
+data.table::rbindlist(dt_li)              # bind the data tables
+```
+
+
+## Solve Muskat's Equation using Runge-Kutta
+
+```{r}
+MuskatRK4App <- function(stepSize) {
+    ode <- MuskatODE(0, 1)
+    ode_solver <- RK4(ode)
+    ode_solver <- setStepSize(ode_solver, stepSize)
+    rowVector <- vector("list")
+    pres <-  0
+    i    <-  1
+    while (pres < 5) {
+        state <- getState(ode_solver@ode)
+        pres <- state[2]
+        error <- getExactSolution(ode_solver@ode, pres) - state[1]
+        rowVector[[i]] <- list(step_size = stepSize, 
+                               P = pres, 
+                               S = state[1], 
+                               exact = getExactSolution(ode_solver@ode, pres),
+                               error = error, 
+                               rel_err = error / getExactSolution(ode_solver@ode, pres),
+                               steps = ode_solver@ode@stack$n
+                               )
+        ode_solver <- step(ode_solver)
+        i <- i + 1
+    }
+    data.table::rbindlist(rowVector)
+}
+
+# get a summary table for different step sizes
+get_table <- function(stepSize) {
+    dt <- MuskatRK4App(stepSize)
+    dt[round(P, 1) %in% c(1.0, 2.0, 3.0, 4.0, 5.0)]
+}
+
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, get_table)
+data.table::rbindlist(dt_li)
+```
+
+We see above that we are repeating code when the only parameter needed to be changed is the ODE solver. In cases where we want to test different ODE solvers it is more convenient to use the function `ODESolverFactory` and send the solver as a parameter.
+
+
+## Using a solver factory
+
+```{r}
+ComparisonMuskatODEApp <- function(solver, stepSize) {
+    ode <- MuskatODE(0, 1)
+    solver_factory <- ODESolverFactory()
+    ode_solver <- createODESolver(solver_factory, ode, solver)
+    ode_solver <- setStepSize(ode_solver, stepSize)
+    rowVector  <- vector("list")
+    pres <-  0
+    i    <-  1
+    while (pres < 5.001) {
+        state <- getState(ode_solver@ode)
+        pres  <- state[2]
+        error <- getExactSolution(ode_solver@ode, pres) - state[1]
+        rowVector[[i]] <- list(solver = solver,
+                               step_size = stepSize, 
+                               P = pres, 
+                               S = state[1], 
+                               exact = getExactSolution(ode_solver@ode, pres),
+                               error = error, 
+                               rel_err = error / getExactSolution(ode_solver@ode, pres),
+                               steps = ode_solver@ode@stack$n
+                               )
+        ode_solver <- step(ode_solver)
+        pres <- pres + getStepSize(ode_solver)    # step size retrievd from ODE solver
+        i <- i + 1
+    }
+    data.table::rbindlist(rowVector)
+}
+
+# get a summary table for different step sizes
+create_table <- function(stepSize, solver) {
+    dt <- ComparisonMuskatODEApp(solver, stepSize)
+    # dt
+    dt[round(P, 1) %in% c(1.0, 2.0, 3.0, 4.0, 5.0)]
+}
+```
+
+
+### Euler
+```{r}
+# Create summary table for ODE solver Euler
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "Euler")
+data.table::rbindlist(dt_li)
+```
+
+### Euler-Richardson
+```{r}
+# Create summary table for ODE solver EulerRichardson
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "EulerRichardson")
+data.table::rbindlist(dt_li)
+```
+
+### Runge-Kutta
+
+```{r}
+# Create summary table for ODE solver RK4
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "RK4")
+data.table::rbindlist(dt_li)
+```
+
+### Runge-Kutta 45
+
+```{r}
+# Create summary table for ODE solver RK45
+step_sizes <- c(0.2, 0.1, 0.05)
+dt_li <- lapply(step_sizes, create_table, solver = "RK45")
+data.table::rbindlist(dt_li)
+```
+
+And so on. We could this better. We will show how to do this using nested `lapply` functions.
+
+## What about doing all in one step
+
+```{r}
+# vectors for the solvers and step sizes
+step_sizes <- c(0.2, 0.1, 0.05)
+solvers <- c("Euler", "EulerRichardson", "Verlet", "RK4", "RK45")
+```
+
+
+```{r}
+# nested lapply to iterate through solvers and step sizes
+df_li <- lapply(solvers, function(svr)
+            lapply(step_sizes, function(stepsz) create_table(stepsz, svr)))
+
+# join the resulting dataframes
+df_all <- data.table::rbindlist(unlist(df_li, recursive = FALSE))
+df_all
+```
+
+### Plot the error of the solvers
+
+```{r}
+ggplot(df_all, aes(x = P, y = rel_err, group = step_size, fill = solver )) +
+    geom_line() + 
+    geom_area(stat = "identity") + 
+    facet_grid(step_size ~ solver)
+```
+
+In this last plot we want to compare the relative error of the ODE solvers that show the least error: RK4 and RK45. At the same time, we will exclude the step size of 0.2 since its error magnitude would hide those of the smaller steps.
+
+### Plot RK4 vs RK45
+
+```{r}
+ggplot(subset(df_all, solver %in% c("RK4", "RK45") & step_size %in% c(0.1, 0.05)), aes(x = P, y = rel_err, group = step_size, fill = solver )) +
+    geom_line() + 
+    geom_area(stat = "identity") + 
+    facet_grid(step_size ~ solver) 
+```
+
+
+
+
+
+

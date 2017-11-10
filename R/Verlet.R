@@ -1,16 +1,13 @@
-# Verlet.R
 
-# Verlet ODE solver
-#
-
-#' Verlet class
+#' Verlet ODE solver class
 #'
 #' @param ode an ODE object
 #' @param object a class object
+#' @param stepSize size of the step
 #' @param ... additional parameters
 #'
-#' @rdname Verlet-class
 #' @example ./inst/examples/KeplerEnergyApp.R
+#' @rdname Verlet-class
 .Verlet <- setClass("Verlet", slots = c(
               rate1 = "numeric",
               rate2 = "numeric",
@@ -19,6 +16,14 @@
                 contains = c("AbstractODESolver")
             )
 
+#' Verlet generic
+#'
+#' @rdname Verlet-class
+#' @export
+#' @example ./inst/examples/LogisticApp.R
+setGeneric("Verlet", function(ode, ...)  standardGeneric("Verlet"))
+
+
 setMethod("initialize", "Verlet", function(.Object, ode, ...) {
     # initialize the class
     .Object@rateCounter <- -1
@@ -26,8 +31,8 @@ setMethod("initialize", "Verlet", function(.Object, ode, ...) {
     return(.Object)
 })
 
-
-#' @rdname init-method
+#' @rdname Verlet-class
+#' @aliases init-methods
 #' @importFrom methods callNextMethod
 setMethod("init", "Verlet", function(object, stepSize, ...) {
     # inititalize the solver
@@ -42,12 +47,13 @@ setMethod("init", "Verlet", function(object, stepSize, ...) {
 
 
 #' @rdname Verlet-class
+#' @aliases getRateCounter,getRateCounter-method
 setMethod("getRateCounter", "Verlet", function(object, ...) {
     return(object@rateCounter)
 })
 
 
-#' @rdname step-method
+#' @rdname Verlet-class
 setMethod("step", "Verlet", function(object, ...) {
     # state[]: x1, d x1/dt, x2, d x2/dt .... xN, d xN/dt, t
     state <- getState(object@ode)                         # get the state vector
@@ -94,6 +100,8 @@ setMethod("step", "Verlet", function(object, ...) {
     object@ode@state <- state
     object                                  # use this object to reassign in R
 })
+
+
 
 
 

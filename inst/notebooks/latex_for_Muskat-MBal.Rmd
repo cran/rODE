@@ -1,0 +1,38 @@
+---
+title: "Muskat Material Balance"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Muskat Material Balance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Context style
+
+$$\newcommand{\numC}{{\frac {S_o}{B_o B_g} \frac {dR_s}{dP} +  
+\frac {S_o}{B_o} \frac {k_g}{k_o} \frac {\mu_o}{\mu_g} \frac {dB_o}{dP} + 
+(1 - S_o - S_w) \frac {1}{B_g} \frac {dB_g}{dP} }}$$
+
+
+$$\frac {dS_o}{dP} = \frac {\numC} {1 + \frac {k_g}{k_o} \frac {\mu_o}{\mu_g} }$$
+
+
+
+## Display style
+
+$$\newcommand{\numD}{{\dfrac {S_o}{B_o B_g} \dfrac {dR_s}{dP} +  
+\dfrac {S_o}{B_o} \dfrac {k_g}{k_o} \dfrac {\mu_o}{\mu_g} \dfrac {dB_o}{dP} + 
+(1 - S_o - S_w) \dfrac {1}{B_g} \dfrac {dB_g}{dP} }}$$
+
+
+$$\dfrac {dS_o}{dP} = \dfrac {\numD} {1 + \dfrac {k_g}{k_o} \dfrac {\mu_o}{\mu_g} }$$
+
+## Text style
+$$\newcommand{\numT}{{\tfrac {S_o}{B_o B_g} \tfrac {dR_s}{dP} +  
+\tfrac {S_o}{B_o} \tfrac {k_g}{k_o} \tfrac {\mu_o}{\mu_g} \tfrac {dB_o}{dP} + 
+(1 - S_o - S_w) \tfrac {1}{B_g} \tfrac {dB_g}{dP} }}$$
+
+
+$$\tfrac {dS_o}{dP} = \tfrac {\numT} {1 + \tfrac {k_g}{k_o} \tfrac {\mu_o}{\mu_g} }$$

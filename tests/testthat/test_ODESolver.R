@@ -19,7 +19,7 @@ test_that("ODESolver has methods implemented", {
     #
     # # vector comparison of methods
     expect_equal(showMethods2("ODESolver"),
-                 c("getStepSize", "init", "setStepSize", "step"))
+                 c("getODE", "getStepSize", "init", "setStepSize", "step"))
 })
 
 

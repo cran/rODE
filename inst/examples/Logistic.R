@@ -2,12 +2,12 @@
 # Simulates the logistic equation
 
 setClass("Logistic", slots = c(
-    K = "numeric",
-    r = "numeric",
-    odeSolver = "Verlet",
-    counter = "numeric"
-),
-contains = c("ODE")
+        K = "numeric",
+        r = "numeric",
+        odeSolver = "Verlet",
+        counter = "numeric"
+        ),
+        contains = c("ODE")
 )
 
 setMethod("initialize", "Logistic", function(.Object, ...) {
@@ -35,6 +35,15 @@ setMethod("init", "Logistic", function(object, initState, r, K, ...) {
     object@r <- r
     object@K <- K
     object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+    object@counter <- 0
+    object
+})
+
+setReplaceMethod("init", "Logistic", function(object, ..., value) {
+    object@r <- value[["r"]]
+    object@K <- value[["K"]]
+    object@state <- value[["initState"]]
     object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
     object@counter <- 0
     object

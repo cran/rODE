@@ -45,6 +45,14 @@ setMethod("init", "KeplerEnergy", function(object, initState, ...) {
 })
 
 
+setReplaceMethod("init", "KeplerEnergy", function(object, ..., value) {
+    initState <- value
+    object@state <- initState
+    object@odeSolver <- init(object@odeSolver, getStepSize(object@odeSolver))
+    object@counter <- 0
+    object
+})
+
 setMethod("getRate", "KeplerEnergy", function(object, state, ...) {
     # Computes the rate using the given state.
     r2 <- state[1] * state[1] + state[3] * state[3]  # distance squared

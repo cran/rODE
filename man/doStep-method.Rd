@@ -2,7 +2,7 @@
 % Please edit documentation in R/ode_generics.R
 \name{doStep}
 \alias{doStep}
-\title{Perform a step}
+\title{doStep}
 \usage{
 doStep(object, ...)
 }
@@ -32,12 +32,12 @@ PlanetApp <- function(verbose = FALSE) {
     rowvec <- vector("list")
     i <- 1
     # run infinite loop. stop with ESCAPE.
-    while (planet@state[5] <= 90) {     # Earth orbit is 365 days around the sun
-        rowvec[[i]] <- list(t  = planet@state[5],     # just doing 3 months
-                            x  = planet@state[1],     # to speed up for CRAN
-                            vx = planet@state[2],
-                            y  = planet@state[3],
-                            vy = planet@state[4])
+    while (getState(planet)[5] <= 90) {     # Earth orbit is 365 days around the sun
+        rowvec[[i]] <- list(t  = getState(planet)[5],     # just doing 3 months
+                            x  = getState(planet)[1],     # to speed up for CRAN
+                            vx = getState(planet)[2],
+                            y  = getState(planet)[3],
+                            vy = getState(planet)[4])
         for (j in 1:5) {                 # advances time
             planet <- doStep(planet)
         }
@@ -63,17 +63,30 @@ LogisticApp <- function(verbose = FALSE) {
     r  <- 2        # Malthusian parameter (rate of maximum population growth)
     K  <- 10.0     # carrying capacity of the environment
     dt   <- 0.01; tol  <- 1e-3; tmax <- 10
-    population <- Logistic()
-    population <- init(population, c(x, vx, 0), r, K)
-    odeSolver <- Verlet(population)
-    odeSolver <- init(odeSolver, dt)
+
+    population <- Logistic()                # create a Logistic ODE object
+
+    # Two ways of initializing the object
+      # population <- init(population, c(x, vx, 0), r, K)
+    init(population) <-  list(initState = c(x, vx, 0),
+                              r = r,
+                              K = K)
+
+    odeSolver <- Verlet(population)        # select the solver
+
+    # Two ways of initializing the solver
+      # odeSolver <- init(odeSolver, dt)
+    init(odeSolver) <-  dt
+
     population@odeSolver <- odeSolver
+    # setSolver(population) <-  odeSolver
+
     rowVector <- vector("list")
     i <- 1
     while (getTime(population) <= tmax) {
         rowVector[[i]] <- list(t = getTime(population),
-                               s1 = population@state[1],
-                               s2 = population@state[2])
+                               s1 = getState(population)[1],
+                               s2 = getState(population)[2])
         population <- doStep(population)
         i <- i + 1
     }
